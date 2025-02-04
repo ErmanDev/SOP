@@ -1,1 +1,0 @@
-# Agropro-Agritech-POS
