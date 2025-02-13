@@ -95,7 +95,7 @@ const LayoutPage = ({ children }: { children: ReactNode }) => {
                 </BreadcrumbLink>
               </BreadcrumbItem>
               {identifierCrumb().length < 2 ? 
-              "Welcome Admin, Yana!"
+              "Welcome Admin, Pualine"
                 
               :
               (<>
