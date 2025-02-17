@@ -3,6 +3,8 @@ import PageLayout from '@/layouts/page.layout';
 import LoginPage from '@/modules/Auth/login.page';
 import AdminLayout from '@/layouts/admin.layout';
 import DashboardPage from '@/modules/Admin/Dashboard/dashboard.page';
+import OverviewDashboard from '@/modules/Admin/Dashboard/overviewDashboard.page';
+
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +25,21 @@ export const router = createBrowserRouter([
       {
         index: true,
         Component: DashboardPage,
+      },{
+        path: "",
+        Component: DashboardPage,
+        children: [
+          {
+            index: true,
+            Component: OverviewDashboard,
+          },
+          {
+            path: "overview",
+            Component: OverviewDashboard,
+          },
+          {
+          },
+        ],
       },
     ],
   },

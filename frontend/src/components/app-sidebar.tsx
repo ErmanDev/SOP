@@ -4,6 +4,8 @@ import {
 
   BookOpen,
 
+  Calendar,
+
   GalleryVerticalEnd,
   LayoutDashboardIcon,
 
@@ -43,23 +45,9 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "#",
+      url: "",
       icon: LayoutDashboardIcon,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
+      
     },
     {
       title: "Employees",
@@ -70,15 +58,16 @@ const data = {
           title: "Genesis",
           url: "#",
         },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+   
       ],
+    },
+
+    {
+      title: "Attendance",
+      url: "#",
+      icon: Calendar,
+
+   
     },
     {
       title: "Payroll",
@@ -107,24 +96,8 @@ const data = {
       title: "Settings",
       url: "#",
       icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
+
+    
     },
   ],
  
@@ -141,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
     
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter> 
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />

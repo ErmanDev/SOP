@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/sr-tabs";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import OverviewDashboard from "./overviewDashboard.page";
 // import BookletDashboard from "./overview-dash";
 
 const DashboardPage = () => {
@@ -21,10 +22,10 @@ const DashboardPage = () => {
         </TabsList>
       </div>
 
-        {/* <TabsContent value={currentTab as string === "dashboard-app" ? "overview" : currentTab as string}>
-          {currentTab === 'dashboard-app' ? <BookletDashboard /> : <Outlet />}
+        <TabsContent value={currentTab as string === "dashboard-app" ? "overview" : currentTab as string}>
+          {currentTab === 'dashboard-app' ? <OverviewDashboard /> : <Outlet />}
 
-        </TabsContent> */}
+        </TabsContent>
     </Tabs>
   )
 }
