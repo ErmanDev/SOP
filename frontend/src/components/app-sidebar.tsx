@@ -45,7 +45,7 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "",
+      url: "/",
       icon: LayoutDashboardIcon,
       
     },
@@ -55,10 +55,21 @@ const data = {
       icon: PersonStanding,
       items: [
         {
-          title: "Genesis",
+          title: "Employee List",
           url: "#",
         },
-   
+        
+
+        {
+          title: "Cash Advance",
+          url: "#",
+        },
+        
+        {
+          title: "Schedule",
+          url: "#",
+        },
+        
       ],
     },
 

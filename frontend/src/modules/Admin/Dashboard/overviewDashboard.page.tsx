@@ -2,9 +2,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CheckCheck, Clock, DollarSign, MessageSquareWarningIcon, Percent, Pill, Stethoscope, Thermometer, Timer, TrendingDown, TrendingUp } from 'lucide-react'
+import {  DollarSign, MessageSquareWarningIcon, Timer, TrendingDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
-import { Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { StatCardProps } from "./types"
 import { PersonIcon } from "@radix-ui/react-icons"
 
@@ -24,13 +24,6 @@ const medicineAvailabilityData = [
   { month: "Dec", pharmacy1: 96, pharmacy2: 99, pharmacy3: 92 },
 ];
 
-
-const medicineTypeData = [
-  { type: "Pain Relief", prescriptions: 1200, otc: 3500 },
-  { type: "Heart Medication", prescriptions: 1800, otc: 800 },
-  { type: "Diabetes Medication", prescriptions: 1600, otc: 1200 },
-  { type: "Blood Pressure", prescriptions: 2000, otc: 1500 },
-]
 
 const pharmacyPopularityData = [
   { name: "PharmaCare", value: 35 },
