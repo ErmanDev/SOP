@@ -124,7 +124,7 @@ const UserContentForm = () => {
         >
           <PlusCircleIcon className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-            Add User
+            Add Employee
           </span>
         </Button>
       </SheetTrigger>

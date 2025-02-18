@@ -1,22 +1,16 @@
 "use client"
 
-
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { generatePassword } from "@/shared/generateRandomPassword"
 import { useEffect } from "react"
 
-
-
-
-
-// This can come from your database or API.
+// Component initialization
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const UserForm = ({ form }: any) => {
-  
-
   const { setFocus, setValue, formState } = form;
   const { errors } = formState;
 
@@ -135,7 +129,4 @@ export const UserForm = ({ form }: any) => {
 }
 
 export default UserForm;
-function generatePassword(): any {
-  throw new Error("Function not implemented.")
-}
 
