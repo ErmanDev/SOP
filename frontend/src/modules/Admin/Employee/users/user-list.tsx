@@ -146,7 +146,7 @@ const UsersList = () => {
             <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               className="w-full h-8 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
-              placeholder="Search user..."
+              placeholder="Search Employee..."
               type="search"
             />
           </div>
@@ -166,7 +166,7 @@ const UsersList = () => {
                 <TableRow>
                   <TableHead className="hidden w-[100px] sm:table-cell">
                     <span className="sr-only">Image</span>
-                  </TableHead>
+                  </TableHead>  <TableHead>Name</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="hidden md:table-cell">
