@@ -5,44 +5,73 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { MoreHorizontalIcon, Search,  } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import IUser from "./user.interface"
+
 
 import { Spinner } from "@/components/spinner"
 import { Badge } from "@/components/ui/badge"
 import { useMemo, useState } from "react"
-import useReadUsers from "./hooks/useReadUsers"
-import UserContentForm from "./user-content-form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import UserContentForm from "../Employee/users/user-content-form"
+import useReadUsers from "../Employee/users/hooks/useReadUsers"
 
-// Assume these functions make API calls to your backend
+const SAMPLE_PAYROLL_DATA = [
+  {
+    id: 1,
+    firstName: "John",
+    lastName: "Doe",
+    employeeId: "EMP-001",
+    department: "IT",
+    position: "Senior Developer",
+    basicSalary: "5000",
+    overtime: "500",
+    allowances: "800",
+    deductions: "300",
+    epf: "600",
+    socso: "50",
+    netSalary: "5350",
+    paymentDate: "25/02/2024",
+    status: "Paid",
+    userImg: "https://avatars.githubusercontent.com/u/124599?v=4"
+  },
+  {
+    id: 2,
+    firstName: "Jane",
+    lastName: "Smith",
+    employeeId: "EMP-002",
+    department: "HR",
+    position: "HR Manager",
+    basicSalary: "4500",
+    overtime: "0",
+    allowances: "600",
+    deductions: "250",
+    epf: "540",
+    socso: "45",
+    netSalary: "4265",
+    paymentDate: "25/02/2024",
+    status: "Pending",
+    userImg: "https://avatars.githubusercontent.com/u/124598?v=4"
+  },
+  {
+    id: 3,
+    firstName: "Mike",
+    lastName: "Johnson",
+    employeeId: "EMP-003",
+    department: "Sales",
+    position: "Sales Executive",
+    basicSalary: "3500",
+    overtime: "300",
+    allowances: "500",
+    deductions: "200",
+    epf: "420",
+    socso: "35",
+    netSalary: "3645",
+    paymentDate: "25/02/2024",
+    status: "Paid",
+    userImg: "https://avatars.githubusercontent.com/u/124597?v=4"
+  }
+];
 
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// const safeAccess = (obj: any, path: string) => {
-//   return path.split('.').reduce((acc, part) => acc && acc[part] !== undefined ? acc[part] : undefined, obj);
-// };
-type RoleColor = {
-  [key in 'admin' | 'staff' | 'visitor']: string;
-};
-
-const roleColors: RoleColor = {
-  admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  staff: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  visitor: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
-};
-
-const RoleBadge = ({ role }: { role: string }) => {
-  const color = role.toLowerCase() in roleColors
-    ? roleColors[role.toLowerCase() as keyof RoleColor]
-    : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
-
-  return (
-    <Badge className={`${color} capitalize`} variant="outline">
-      {role}
-    </Badge>
-  );
-};
-
-const UsersList = () => {
+const TechinicianList = () => {
   const navigate = useNavigate();
   const [selectedPharmacy, setSelectedPharmacy] = useState<string>("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -54,27 +83,23 @@ const UsersList = () => {
   ]
 
   const memoUsers = useMemo(() => {
-    return usersData?.data?.users || [];
-  }, [usersData]);
-
-
+    return SAMPLE_PAYROLL_DATA;
+  }, []);
 
   const pagination = useMemo(() => ({
-    currentPage: usersData?.data?.currentPage?.page || 1,
-    totalPages: usersData?.data?.totalPages || 1,
-    totalDocs: usersData?.data?.totalDocs || 0,
-    limit: usersData?.data?.currentPage?.limit || 20
-  }), [usersData]);
-
-
+    currentPage: 1,
+    totalPages: 1,
+    totalDocs: SAMPLE_PAYROLL_DATA.length,
+    limit: 10
+  }), []);
 
   const renderTableContent = () => {
     if (isLoading) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center">
+          <TableCell colSpan={15} className="h-[400px] text-center">
             <Spinner className="mx-auto" />
-            <span className="sr-only">Loading users...</span>
+            <span className="sr-only">Loading payroll data...</span>
           </TableCell>
         </TableRow>
       );
@@ -83,51 +108,52 @@ const UsersList = () => {
     if (error) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center text-red-500">
-            Error loading users. Please try again later.
+          <TableCell colSpan={15} className="h-[400px] text-center text-red-500">
+            Error loading payroll data. Please try again later.
           </TableCell>
         </TableRow>
       );
     }
 
-   
-    if (!memoUsers || memoUsers.length === 0) {
-      return (
-        <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center">
-            No users found.
-          </TableCell>
-        </TableRow>
-      );
-    }
-
-    return memoUsers.map((user: IUser) => (
+    return memoUsers.map((user) => (
       <TableRow key={user.id}>
         <TableCell className="hidden sm:table-cell">
           <img
             alt={`${user.firstName}'s avatar`}
             className="aspect-square rounded-md object-cover"
             height="64"
-            src={user.userImg as string}
+            src={user.userImg}
             width="64"
           />
         </TableCell>
-        <TableCell className="font-light">
-          <span className="text-md font-bold">{user.firstName} {user.lastName}</span> <br />
-          <span className="text-xs">{user.email}</span>
-        </TableCell>
+        <TableCell className="font-medium">{user.firstName} {user.lastName}</TableCell>
+        <TableCell>{user.employeeId}</TableCell>
+        <TableCell>{user.department}</TableCell>
+        <TableCell>{user.position}</TableCell>
+        <TableCell>RM {user.basicSalary}</TableCell>
+        <TableCell>RM {user.overtime}</TableCell>
+        <TableCell>RM {user.allowances}</TableCell>
+        <TableCell>RM {user.deductions}</TableCell>
+        <TableCell>RM {user.epf}</TableCell>
+        <TableCell>RM {user.socso}</TableCell>
+        <TableCell className="font-bold">RM {user.netSalary}</TableCell>
+        <TableCell>{user.paymentDate}</TableCell>
         <TableCell>
-          <Badge variant="outline">Active</Badge>
+          <Badge 
+            variant="outline" 
+            className={user.status === 'Paid' ? 
+              'bg-green-100 text-green-800' : 
+              'bg-yellow-100 text-yellow-800'
+            }
+          >
+            {user.status}
+          </Badge>
         </TableCell>
-        <TableCell className="hidden md:table-cell">
-          <RoleBadge role={user.userRole || "admin"} />
-        </TableCell>
-        
         <TableCell>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                aria-label={`Actions for ${user.email}`}
+                aria-label={`Actions for ${user.firstName}`}
                 size="icon"
                 variant="ghost"
               >
@@ -136,8 +162,9 @@ const UsersList = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigate(`update_form/${user.user_id}`)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
+              <DropdownMenuItem>View Slip</DropdownMenuItem>
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>Download PDF</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </TableCell>
@@ -168,9 +195,9 @@ const UsersList = () => {
           <CardHeader>
             <div className="flex justify-between items-start ga">
               <div className="flex flex-col">
-                <CardTitle className="text-[#492309]">Users</CardTitle>
+                <CardTitle className="text-[#492309]">Payroll</CardTitle>
                 <CardDescription>
-                  Manage your Users and view their profile.
+                  View and manage all payroll data
                 </CardDescription>
               </div>
               <div>
@@ -192,14 +219,20 @@ const UsersList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">
-                    <span className="sr-only">Image</span>
-                  </TableHead>  <TableHead>Name</TableHead>
-                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden w-[100px] sm:table-cell">Image</TableHead>
+                  <TableHead>Employee Name</TableHead>
+                  <TableHead>Employee ID</TableHead>
+                  <TableHead>Department</TableHead>
+                  <TableHead>Position</TableHead>
+                  <TableHead>Basic Salary</TableHead>
+                  <TableHead>Overtime</TableHead>
+                  <TableHead>Allowances</TableHead>
+                  <TableHead>Deductions</TableHead>
+                  <TableHead>EPF</TableHead>
+                  <TableHead>SOCSO</TableHead>
+                  <TableHead>Net Salary</TableHead>
+                  <TableHead>Payment Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Role
-                  </TableHead>
                   <TableHead>
                     <span className="sr-only">Actions</span>
                   </TableHead>
@@ -220,4 +253,4 @@ const UsersList = () => {
   )
 }
 
-export default UsersList
+export default TechinicianList

@@ -1,4 +1,15 @@
 export default interface IUser {
+  employeeId: string;
+  department: string;
+  position: string;
+  basicSalary: string;
+  overtime: string;
+  allowances: string;
+  deductions: string;
+  epf: string;
+  socso: string;
+  netSalary: string;
+  paymentDate: string;
   id: string; 
 
 

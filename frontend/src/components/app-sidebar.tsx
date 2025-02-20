@@ -51,7 +51,7 @@ const data = {
     },
     {
       title: "Employees",
-      url: "#",
+      url: "users",
       icon: PersonStanding,
       items: [
         {
@@ -62,7 +62,7 @@ const data = {
 
         {
           title: "Cash Advance",
-          url: "#",
+          url: "Cash-Advance",
         },
         
         {
@@ -84,24 +84,19 @@ const data = {
       title: "Payroll",
       url: "#",
       icon: BookOpen,
+
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "Employee Payroll",
+          url: "payroll",
         },
+        
+
         {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+          title: "Employee Funds",
+          url: "funds",
+        },],
+
     },
     {
       title: "Settings",
