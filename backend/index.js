@@ -1,6 +1,7 @@
 const { sequelize } = require('./config/sequelize.js');
 const express = require('express');
 const userRoute = require( './routes/userRoutes.js');
+const userRoleRoute = require('./routes/userRoleRoutes.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,7 @@ app.use(express.json());
 
 
 app.use('/api/users', userRoute);
+app.use('/api/userRoles', userRoleRoute);
 
 
 (async () => {
