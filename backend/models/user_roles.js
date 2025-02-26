@@ -22,7 +22,7 @@ const { sequelize } = require('../config/sequelize.js');
     UserRoles.sync().then(async () => {
       const roles = [
         { role_id: 1, role_name: 'admin' },
-        { role_id: 2, role_name: 'hr' },
+        { role_id: 2, role_name: 'manager' },
 
       ];
   
