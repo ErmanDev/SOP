@@ -23,8 +23,7 @@ const { sequelize } = require('../config/sequelize.js');
       const roles = [
         { role_id: 1, role_name: 'admin' },
         { role_id: 2, role_name: 'hr' },
-        { role_id: 3, role_name: 'manager' },
-        { role_id: 4, role_name: 'technician'}
+
       ];
   
       for (const role of roles) {
