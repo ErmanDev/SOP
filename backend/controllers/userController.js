@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 
-// Get all users
+
 const getUsers = async (req, res) => {
   try {
     const users = await User.findAll();
@@ -22,32 +22,8 @@ const getUserById = async (req, res) => {
   }
 };
 
-// Register a new user
-const registerUser = async (req, res) => {
-  try {
-    const { firstName, lastName, email, password } = req.body;
 
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email already registered' });
-    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = await User.create({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword, // Store hashed password
-    });
-
-    res.status(201).json({ message: 'User registered successfully', user: newUser });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
 
 const loginUser = async (req, res) => {
   try {
@@ -80,11 +56,44 @@ const deleteUser = async (req, res) => {
   }
 };
 
+
+const countUsers = async (res) => {
+  try {
+    const totalUsers = await User.count();
+    res.status(200).json({ totalUsers: totalUsers });
+  } catch (error) {
+    console.error('Error counting users:', error);
+    res.status(500).json({ message: 'An error occurred while counting users', error });
+  }
+};
+
+const countTechnicians = async (req, res) => {
+  try {
+    const totalTechnicians = await User.count({ where: { position: 'technician' } });
+    res.status(200).json({ totalTechnicians: totalTechnicians });
+  } catch (error) {
+    console.error('Error counting technicians:', error);
+    res.status(500).json({ message: 'An error occurred while counting technicians', error });
+  }
+};
+
+const countManagers = async (res) => {
+  try {
+    const totalManagers = await User.count({ where: { position: 'manager' } });
+    res.status(200).json({ totalManagers: totalManagers });
+  } catch (error) {
+    console.error('Error counting managers:', error);
+    res.status(500).json({ message: 'An error occurred while counting managers', error });
+  }
+};
+
 module.exports = {
   getUsers,
   getUserById,
-  registerUser,
   loginUser,
   deleteUser,
+  countUsers,
+  countTechnicians,
+  countManagers
 
 };
