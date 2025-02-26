@@ -58,7 +58,7 @@ const loginUser = async (req, res) => {
     });
 
     if (!user) {
-      console.log('No user found with email:', email);
+ 
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
