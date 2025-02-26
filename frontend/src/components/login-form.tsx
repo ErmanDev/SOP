@@ -1,4 +1,7 @@
-import { cn } from '@/lib/utils';
+'use client';
+
+import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,7 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { EyeOpenIcon } from '@radix-ui/react-icons';
 
 export function LoginForm({
   className,
@@ -16,7 +18,6 @@ export function LoginForm({
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const saveToCookies = (
@@ -32,39 +33,28 @@ export function LoginForm({
   };
 
   const handleLogin = async () => {
-    setError('');
     setIsLoading(true);
-
     try {
       const response = await axios.post(
         'http://localhost:3000/api/auth/login',
         { email, password }
       );
-
-      console.log('Login response:', response.data);
-
       if (!response.data.accessToken) {
         throw new Error('No access token received');
       }
-
       const { accessToken, role_id, uid, first_name } = response.data;
-
       saveToCookies(accessToken, role_id, uid, first_name);
-
       if (uid) {
         localStorage.setItem('uid', uid.toString());
         sessionStorage.setItem('uid', uid.toString());
-        navigate('/dashboard-app/overview');
+        navigate('/dashboard-app');
+        toast.success('Login successful');
       } else {
-        setError('Invalid response from server');
+        toast.error(response?.data?.error || 'Login failed');
       }
     } catch (error: any) {
-      console.error('Login error:', error);
-      setError(
-        error.response?.data?.error ||
-          error.message ||
-          'Login failed. Please try again.'
-      );
+      const errorMessage = error.response?.data?.error || error.message;
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +66,8 @@ export function LoginForm({
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={className} {...props}>
+      <Toaster /> {/* Add Toaster here to display toast messages */}
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -99,15 +90,7 @@ export function LoginForm({
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a
-                    href="auth"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -115,21 +98,15 @@ export function LoginForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <EyeOpenIcon className="w-6 h-6 text-muted-foreground" />
               </div>
-              {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
-                  {error}
-                </div>
-              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
           </form>
-          <div className="relative  hidden bg-muted md:block">
+          <div className="relative hidden bg-muted md:block">
             <img
-              src="../assets/Agro.jpg" // ✅ Use a relative path
+              src="../assets/Agro.jpg"
               alt="Agro Logo"
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
