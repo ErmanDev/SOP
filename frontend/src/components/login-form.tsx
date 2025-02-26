@@ -50,11 +50,11 @@ export function LoginForm({
         navigate('/dashboard-app');
         toast.success('Login successful');
       } else {
-        toast.error(response?.data?.error || 'Login failed');
+        toast.error(response?.data?.error);
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || error.message;
-      toast.error(errorMessage);
+      toast.warning(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +67,7 @@ export function LoginForm({
 
   return (
     <div className={className} {...props}>
-      <Toaster /> {/* Add Toaster here to display toast messages */}
+      <Toaster richColors expand={false} />
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -75,7 +75,7 @@ export function LoginForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground">
-                  Login to your Acme Inc account
+                  Login to your Agropro account
                 </p>
               </div>
               <div className="grid gap-2">
@@ -113,7 +113,7 @@ export function LoginForm({
           </div>
         </CardContent>
       </Card>
-      <div className="text-center text-xs text-muted-foreground">
+      <div className="text-center text-xs text-muted-foreground mt-5">
         By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
         and <a href="#">Privacy Policy</a>.
       </div>
