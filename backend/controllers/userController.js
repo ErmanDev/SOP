@@ -24,24 +24,6 @@ const getUserById = async (req, res) => {
 
 
 
-
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) return res.status(400).json({ message: 'Invalid credentials' });
-
-    res.json({ message: 'Login successful' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
 // Delete a user
 const deleteUser = async (req, res) => {
   try {
@@ -53,6 +35,50 @@ const deleteUser = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { first_name, middle_name, last_name, suffix, position, status, gender, email, password, role_id } = req.body;
+
+   
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+  
+    const validPositions = ['hr', 'manager', 'technician'];
+    if (position && !validPositions.includes(position.toLowerCase())) {
+      return res.status(400).json({ message: 'Invalid position' });
+    }
+
+    let hashedPassword = user.password;
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      hashedPassword = await bcrypt.hash(password, salt);
+    }
+
+ 
+    await user.update({
+      first_name,
+      middle_name,
+      last_name,
+      suffix,
+      position,
+      status: status || user.status,
+      gender,
+      email,
+      password: hashedPassword,
+      role_id: role_id || user.role_id,
+    });
+
+    res.status(200).json({ message: 'User updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -90,7 +116,7 @@ const countManagers = async (res) => {
 module.exports = {
   getUsers,
   getUserById,
-  loginUser,
+  updateUser,
   deleteUser,
   countUsers,
   countTechnicians,
