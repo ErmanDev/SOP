@@ -25,7 +25,6 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.5"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC"

@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/User');
+const User = require('../models/user');
 const {createTokens} = require('../middlewares/jwt');
 
 
@@ -47,49 +47,81 @@ const registerUser = async (req, res) => {
   }
 };
 
-const loginUser =  async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ where: { email: email } });
-        console.log(user)
-        if (!user && !password) {
-            return res.status(400).json({
-                error: "There is no input"
-            });
-        }
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    console.log('Login attempt for email:', email);
 
-        if (!user) {
-            return res.status(400).json({ error: "Provide user input" });
-        }
-        if (!password) {
-            return res.status(400).json({ error: "Provide password input" });
-        }
-        if (user.status == "inactive") {
-            return res.status(400).json({ error: "Account is inactive please contact your administrator for further info" });
-        }
+    const user = await User.findOne({ 
+      where: { email },
+      raw: true  // Get plain object
+    });
 
-        const dbPassword = user.password;
-        const match = await bcrypt.compare(password, dbPassword);
-
-        if (!match) {
-            return res.status(400).json({ error: "Wrong username and password combination" });
-        } else {
-            const accessToken = createTokens(user);
-
-            res.json({
-                message: `Logged in! User ID: ${user.id} Username: ${user.username} User type: ${user.role_id}`,
-                accessToken: accessToken,
-                role_id: user.role_id,
-                uid: user.user_id,
-                first_name: user.first_name
-           
-            });    
-        }
-
-    } catch (error) {
-        console.error("Error:", error.message);
-        res.status(500).send("Internal Server Error", error.message);
+    if (!user) {
+      console.log('No user found with email:', email);
+      return res.status(401).json({ error: "Invalid email or password" });
     }
+
+    // Log the found user (excluding sensitive data)
+    console.log('Found user:', {
+      id: user.id,
+      email: user.email,
+      role_id: user.role_id,
+      stored_password_length: user.password?.length
+    });
+
+    // Log password comparison
+    const match = await bcrypt.compare(password, user.password);
+    console.log('Password comparison result:', match);
+
+    if (!match) {
+      console.log('Password mismatch for user:', email);
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+
+    // Check user status
+    if (user.status === "inactive") {
+      console.log('Inactive user attempted login:', email);
+      return res.status(403).json({ error: "Account is inactive" });
+    }
+
+    const accessToken = createTokens(user);
+    console.log('Generated access token:', accessToken ? 'Token created' : 'Token creation failed');
+
+    const responseData = {
+      message: "Login successful",
+      accessToken,
+      role_id: user.role_id,
+      uid: user.id,
+      first_name: user.first_name
+    };
+    
+    console.log('Sending successful response for user:', email);
+    res.json(responseData);
+
+  } catch (error) {
+    console.error("Login error details:", {
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(500).json({ 
+      error: "Internal Server Error", 
+      details: error.message 
+    });
+  }
 };
 
-module.exports = { registerUser, loginUser };
+const logoutUser = async (req, res) => {
+    try {
+      const token  = req.headers.authorization.split(" ")[1];
+      if (!token) return res.status(401).json({ message: "No token provided" });
+
+      await Blacklist.create({ token });
+
+      res.json({ message: "Logout successful" });
+
+    }catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+}
+module.exports = { registerUser, loginUser, logoutUser };
