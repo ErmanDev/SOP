@@ -1,6 +1,4 @@
 'use client';
-
-import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -20,33 +18,34 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const saveToCookies = (
-    accessToken: string,
-    role_name: string,
-    uid: string,
-    first_name: string
-  ) => {
-    Cookies.set('access_token', accessToken, { expires: 1 });
-    Cookies.set('role_name', role_name, { expires: 1 });
-    Cookies.set('uid', uid, { expires: 1 });
-    Cookies.set('first_name', first_name, { expires: 1 });
-  };
-
   const handleLogin = async () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
         'http://localhost:3000/api/auth/login',
-        { email, password }
+        {
+          email,
+          password,
+        }
       );
+
+      const { accessToken, role_id, uid, first_name } = response.data;
+
       if (!response.data.accessToken) {
         throw new Error('No access token received');
       }
-      const { accessToken, role_id, uid, first_name } = response.data;
-      saveToCookies(accessToken, role_id, uid, first_name);
+
       if (uid) {
+        Cookies.set('access_token', accessToken);
         localStorage.setItem('uid', uid.toString());
+        localStorage.setItem('first_name', first_name);
+        localStorage.setItem('role_id', role_id.toString());
+        localStorage.setItem('email', email);
         sessionStorage.setItem('uid', uid.toString());
+        sessionStorage.setItem('first_name', first_name);
+        sessionStorage.setItem('role_id', role_id.toString());
+        sessionStorage.setItem('email', email);
+
         navigate('/dashboard-app');
         toast.success('Login successful');
       } else {
@@ -54,7 +53,7 @@ export function LoginForm({
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || error.message;
-      toast.warning(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -67,7 +66,6 @@ export function LoginForm({
 
   return (
     <div className={className} {...props}>
-      <Toaster richColors expand={false} />
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -83,7 +81,7 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="example@gmail.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -94,6 +92,7 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
+                  placeholder="*******"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

@@ -11,7 +11,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { UserHeader } from '@/components/user-header';
 import { ReactNode } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import Cookies from 'js-cookie';
 
 const LayoutPage = ({ children }: { children: ReactNode }) => {
   const { pathname } = useLocation();
@@ -25,7 +24,9 @@ const LayoutPage = ({ children }: { children: ReactNode }) => {
       .join(' ');
   };
 
-  const firstName = capitalizeWords(Cookies.get('first_name') || 'User');
+  const firstName = capitalizeWords(
+    localStorage.getItem('first_name') || 'User'
+  );
 
   const identifierCrumb = (): string => {
     const lastRoute = pathname.split('/');

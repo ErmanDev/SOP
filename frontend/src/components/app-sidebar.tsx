@@ -1,114 +1,107 @@
-import "@/assets/agro.jpg"
-import * as React from "react"
+import '@/assets/agro.jpg';
+import * as React from 'react';
 import {
-
   BookOpen,
-
   Calendar,
-
   GalleryVerticalEnd,
   LayoutDashboardIcon,
-
   PersonStanding,
-
   Settings2,
+} from 'lucide-react';
 
-} from "lucide-react"
+import { NavMain } from '@/components/nav-main';
 
-import { NavMain } from "@/components/nav-main"
-
-import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { NavUser } from '@/components/nav-user';
+import { TeamSwitcher } from '@/components/team-switcher';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar';
 
+const capitalizeWords = (str: string) => {
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
+const firstName = capitalizeWords(localStorage.getItem('first_name') || 'User');
+const email = localStorage.getItem('email') || 'example@gmail.com';
 
 const data = {
   user: {
-    name: "HR Admin",
-    email: "m@example.com",
-    avatar: "/assets/agro.jpg",
+    name: firstName,
+    email: email,
+    avatar: '../assets/logos.png',
   },
   teams: [
     {
-      name: "AGROPRO",
+      name: 'AGROPRO',
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: 'Enterprise',
     },
- 
   ],
   navMain: [
     {
-      title: "Dashboard",
-      url: "/dashboard-app",
+      title: 'Dashboard',
+      url: '/dashboard-app',
       icon: LayoutDashboardIcon,
-      
     },
     {
-      title: "Employees",
-      url: "users",
+      title: 'Employees',
+      url: 'users',
       icon: PersonStanding,
       items: [
         {
-          title: "Users",
-          url: "users",
+          title: 'Users',
+          url: 'users',
         },
-        
 
         {
-          title: "Cash Advance",
-          url: "Cash-Advance",
+          title: 'Cash Advance',
+          url: 'Cash-Advance',
         },
-        
+
         {
-          title: "Schedule",
-          url: "#",
+          title: 'Schedule',
+          url: '#',
         },
-        
       ],
     },
 
     {
-      title: "Attendance",
-      url: "#",
+      title: 'Attendance',
+      url: '#',
       icon: Calendar,
-
-   
     },
     {
-      title: "Payroll",
-      url: "#",
+      title: 'Payroll',
+      url: '#',
       icon: BookOpen,
 
       items: [
         {
-          title: "Employee Payroll",
-          url: "payroll",
+          title: 'Employee Payroll',
+          url: 'payroll',
         },
-        
 
         {
-          title: "Employee Funds",
-          url: "funds",
-        },],
-
+          title: 'Employee Funds',
+          url: 'funds',
+        },
+      ],
     },
     {
-      title: "Settings",
-      url: "#",
+      title: 'Settings',
+      url: '#',
       icon: Settings2,
-
-    
     },
   ],
- 
-
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -118,12 +111,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-    
       </SidebarContent>
-      <SidebarFooter> 
+      <SidebarFooter>
         <NavUser user={data.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

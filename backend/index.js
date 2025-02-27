@@ -19,7 +19,7 @@ app.use('/api/auth', authRoute);
 (async () => {
   try {
     await sequelize.sync({ alter: true }); 
-    console.log("✅ Database & tables synchronized");
+  
 
     app.listen(PORT, () => {
       console.log(`🚀 Server is running on port ${PORT}`);
