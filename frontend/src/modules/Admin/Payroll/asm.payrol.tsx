@@ -3,16 +3,16 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { MoreHorizontalIcon, Search,  } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
-import { Spinner } from "@/components/spinner"
+// import { Spinner } from "@/components/spinner"
 import { Badge } from "@/components/ui/badge"
 import { useMemo, useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import UserContentForm from "../Employee/users/user-content-form"
-import useReadUsers from "../Employee/users/hooks/useReadUsers"
+// import useReadUsers from "../Employee/users/hooks/useReadUsers"
 
 const SAMPLE_PAYROLL_DATA = [
   {
@@ -96,10 +96,10 @@ const SAMPLE_PAYROLL_DATA = [
 ];
 
 const ManagerList = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selectedPharmacy, setSelectedPharmacy] = useState<string>("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data: usersData, isLoading, error } = useReadUsers();
+  // const { data:  isLoading, error } = useReadUsers();
   const Teams = [
     { id: 1, name: "North Team", address: "123 Health St", phone: "555-0101", hours: "8AM - 10PM" },
     { id: 2, name: "South Team", address: "456 Wellness Ave", phone: "555-0202", hours: "24/7" },
@@ -117,82 +117,82 @@ const ManagerList = () => {
     limit: 10
   }), []);
 
-  const renderTableContent = () => {
-    if (isLoading) {
-      return (
-        <TableRow>
-          <TableCell colSpan={11} className="h-[400px] text-center">
-            <Spinner className="mx-auto" />
-            <span className="sr-only">Loading payroll data...</span>
-          </TableCell>
-        </TableRow>
-      );
-    }
+  // const renderTableContent = () => {
+  //   if (isLoading) {
+  //     return (
+  //       <TableRow>
+  //         <TableCell colSpan={11} className="h-[400px] text-center">
+  //           <Spinner className="mx-auto" />
+  //           <span className="sr-only">Loading payroll data...</span>
+  //         </TableCell>
+  //       </TableRow>
+  //     );
+  //   }
 
-    if (error) {
-      return (
-        <TableRow>
-          <TableCell colSpan={15} className="h-[400px] text-center text-red-500">
-            Error loading payroll data. Please try again later.
-          </TableCell>
-        </TableRow>
-      );
-    }
+  //   if (error) {
+  //     return (
+  //       <TableRow>
+  //         <TableCell colSpan={15} className="h-[400px] text-center text-red-500">
+  //           Error loading payroll data. Please try again later.
+  //         </TableCell>
+  //       </TableRow>
+  //     );
+  //   }
 
-    return memoUsers.map((user) => (
-      <TableRow key={user.id}>
-        <TableCell className="hidden sm:table-cell">
-          <img
-            alt={`${user.firstName}'s avatar`}
-            className="aspect-square rounded-md object-cover"
-            height="64"
-            src={user.userImg}
-            width="64"
-          />
-        </TableCell>
-        <TableCell className="font-medium">{user.firstName} {user.lastName}</TableCell>
-        <TableCell>RM {user.basicSalary}</TableCell>
-        <TableCell>RM {user.allowances}</TableCell>
-        <TableCell>RM {user.holiday || "0"}</TableCell>
-        <TableCell>RM {user.others || "0"}</TableCell>
-        <TableCell className="bg-red-50">RM {user.insurance || "0"}</TableCell>
-        <TableCell className="bg-red-50">RM {user.deductions || "0"}</TableCell>
-        <TableCell className="bg-red-50">RM {user.deductions || "0"}</TableCell>
-        <TableCell className="font-bold">RM {user.netSalary}</TableCell>
-        <TableCell>{user.accountNo || "-"}</TableCell>
-        <TableCell>
-          <Badge 
-            variant="outline" 
-            className={user.status === 'Paid' ? 
-              'bg-green-100 text-green-800' : 
-              'bg-yellow-100 text-yellow-800'
-            }
-          >
-            {user.status}
-          </Badge>
-        </TableCell>
-        <TableCell>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                aria-label={`Actions for ${user.firstName}`}
-                size="icon"
-                variant="ghost"
-              >
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem>View Slip</DropdownMenuItem>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              <DropdownMenuItem>Download PDF</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </TableCell>
-      </TableRow>
-    ));
-  };
+  //   return memoUsers.map((user) => (
+  //     <TableRow key={user.id}>
+  //       <TableCell className="hidden sm:table-cell">
+  //         <img
+  //           alt={`${user.firstName}'s avatar`}
+  //           className="aspect-square rounded-md object-cover"
+  //           height="64"
+  //           src={user.userImg}
+  //           width="64"
+  //         />
+  //       </TableCell>
+  //       <TableCell className="font-medium">{user.firstName} {user.lastName}</TableCell>
+  //       <TableCell>RM {user.basicSalary}</TableCell>
+  //       <TableCell>RM {user.allowances}</TableCell>
+  //       <TableCell>RM {user.holiday || "0"}</TableCell>
+  //       <TableCell>RM {user.others || "0"}</TableCell>
+  //       <TableCell className="bg-red-50">RM {user.insurance || "0"}</TableCell>
+  //       <TableCell className="bg-red-50">RM {user.deductions || "0"}</TableCell>
+  //       <TableCell className="bg-red-50">RM {user.deductions || "0"}</TableCell>
+  //       <TableCell className="font-bold">RM {user.netSalary}</TableCell>
+  //       <TableCell>{user.accountNo || "-"}</TableCell>
+  //       <TableCell>
+  //         <Badge 
+  //           variant="outline" 
+  //           className={user.status === 'Paid' ? 
+  //             'bg-green-100 text-green-800' : 
+  //             'bg-yellow-100 text-yellow-800'
+  //           }
+  //         >
+  //           {user.status}
+  //         </Badge>
+  //       </TableCell>
+  //       <TableCell>
+  //         <DropdownMenu>
+  //           <DropdownMenuTrigger asChild>
+  //             <Button
+  //               aria-label={`Actions for ${user.firstName}`}
+  //               size="icon"
+  //               variant="ghost"
+  //             >
+  //               <MoreHorizontalIcon className="h-4 w-4" />
+  //             </Button>
+  //           </DropdownMenuTrigger>
+  //           <DropdownMenuContent align="end">
+  //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+  //             <DropdownMenuItem>View Slip</DropdownMenuItem>
+  //             <DropdownMenuItem>Edit</DropdownMenuItem>
+  //             <DropdownMenuItem>Download PDF</DropdownMenuItem>
+  //           </DropdownMenuContent>
+  //         </DropdownMenu>
+  //       </TableCell>
+  //     </TableRow>
+  //   ));
+  // };
 
   return (
     <>

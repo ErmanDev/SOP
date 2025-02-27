@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { MoreHorizontalIcon, Search,  } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 
@@ -72,10 +72,10 @@ const SAMPLE_PAYROLL_DATA = [
 ];
 
 const TechinicianList = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selectedPharmacy, setSelectedPharmacy] = useState<string>("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const { data: usersData, isLoading, error } = useReadUsers();
+  const { data:  isLoading, error } = useReadUsers();
   const Teams = [
     { id: 1, name: "North Team", address: "123 Health St", phone: "555-0101", hours: "8AM - 10PM" },
     { id: 2, name: "South Team", address: "456 Wellness Ave", phone: "555-0202", hours: "24/7" },
