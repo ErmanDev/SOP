@@ -52,6 +52,7 @@ export function NavUser({
     localStorage.removeItem('first_name');
     localStorage.removeItem('role_id');
     localStorage.removeItem('email');
+    Cookies.remove('access_token');
 
     navigate('/');
   };
