@@ -18,7 +18,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log("✅ Connected to TM, GLOBE, TNT, DITO, SMART, SUN");
+    console.log("✅ Connected to Database");
   } catch (error) {
     console.error("❌ Unable to connect to the database:", error);
   }

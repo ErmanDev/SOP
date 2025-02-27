@@ -11,7 +11,7 @@ exports.getAllRoles = async (req, res) => {
     }
 };
 
-// Get a single role by ID
+
 exports.getRoleById = async (req, res) => {
     try {
         const role = await UserRoles.findByPk(req.params.id);
@@ -22,7 +22,7 @@ exports.getRoleById = async (req, res) => {
     }
 };
 
-// Create a new role
+
 exports.createRole = async (req, res) => {
     try {
         const newRole = await UserRoles.create(req.body);
@@ -32,7 +32,7 @@ exports.createRole = async (req, res) => {
     }
 };
 
-// Update an existing role
+
 exports.updateRole = async (req, res) => {
     try {
         const role = await UserRoles.findByPk(req.params.id);

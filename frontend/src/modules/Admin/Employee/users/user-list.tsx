@@ -1,18 +1,44 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { MoreHorizontalIcon, Search,  } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import IUser from "./user.interface"
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { MoreHorizontalIcon, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import IUser from './user.interface';
 
-import { Spinner } from "@/components/spinner"
-import { Badge } from "@/components/ui/badge"
-import { useMemo, useState } from "react"
-import useReadUsers from "./hooks/useReadUsers"
-import UserContentForm from "./user-content-form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Spinner } from '@/components/spinner';
+import { Badge } from '@/components/ui/badge';
+import { useMemo, useState } from 'react';
+import useReadUsers from './hooks/useReadUsers';
+import UserContentForm from './user-content-form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Assume these functions make API calls to your backend
 
@@ -25,15 +51,16 @@ type RoleColor = {
 };
 
 const roleColors: RoleColor = {
-  admin: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  staff: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-  visitor: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  staff: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  visitor: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
 };
 
 const RoleBadge = ({ role }: { role: string }) => {
-  const color = role.toLowerCase() in roleColors
-    ? roleColors[role.toLowerCase() as keyof RoleColor]
-    : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300";
+  const color =
+    role.toLowerCase() in roleColors
+      ? roleColors[role.toLowerCase() as keyof RoleColor]
+      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
 
   return (
     <Badge className={`${color} capitalize`} variant="outline">
@@ -44,29 +71,39 @@ const RoleBadge = ({ role }: { role: string }) => {
 
 const UsersList = () => {
   const navigate = useNavigate();
-  const [selectedPharmacy, setSelectedPharmacy] = useState<string>("All");
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedPharmacy, setSelectedPharmacy] = useState<string>('All');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const { data: usersData, isLoading, error } = useReadUsers();
   const Teams = [
-    { id: 1, name: "North Team", address: "123 Health St", phone: "555-0101", hours: "8AM - 10PM" },
-    { id: 2, name: "South Team", address: "456 Wellness Ave", phone: "555-0202", hours: "24/7" },
-   
-  ]
+    {
+      id: 1,
+      name: 'North Team',
+      address: '123 Health St',
+      phone: '555-0101',
+      hours: '8AM - 10PM',
+    },
+    {
+      id: 2,
+      name: 'South Team',
+      address: '456 Wellness Ave',
+      phone: '555-0202',
+      hours: '24/7',
+    },
+  ];
 
   const memoUsers = useMemo(() => {
     return usersData?.data?.users || [];
   }, [usersData]);
 
-
-
-  const pagination = useMemo(() => ({
-    currentPage: usersData?.data?.currentPage?.page || 1,
-    totalPages: usersData?.data?.totalPages || 1,
-    totalDocs: usersData?.data?.totalDocs || 0,
-    limit: usersData?.data?.currentPage?.limit || 20
-  }), [usersData]);
-
-
+  const pagination = useMemo(
+    () => ({
+      currentPage: usersData?.data?.currentPage?.page || 1,
+      totalPages: usersData?.data?.totalPages || 1,
+      totalDocs: usersData?.data?.totalDocs || 0,
+      limit: usersData?.data?.currentPage?.limit || 20,
+    }),
+    [usersData]
+  );
 
   const renderTableContent = () => {
     if (isLoading) {
@@ -90,11 +127,10 @@ const UsersList = () => {
       );
     }
 
-   
     if (!memoUsers || memoUsers.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center">
+          <TableCell colSpan={8} className="h-[400px]  text-center">
             No users found.
           </TableCell>
         </TableRow>
@@ -113,16 +149,19 @@ const UsersList = () => {
           />
         </TableCell>
         <TableCell className="font-light">
-          <span className="text-md font-bold">{user.firstName} {user.lastName}</span> <br />
+          <span className="text-md font-bold">
+            {user.firstName} {user.lastName}
+          </span>{' '}
+          <br />
           <span className="text-xs">{user.email}</span>
         </TableCell>
         <TableCell>
           <Badge variant="outline">Active</Badge>
         </TableCell>
         <TableCell className="hidden md:table-cell">
-          <RoleBadge role={user.userRole || "admin"} />
+          <RoleBadge role={user.userRole || 'admin'} />
         </TableCell>
-        
+
         <TableCell>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -136,7 +175,11 @@ const UsersList = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => navigate(`update_form/${user.user_id}`)}>Edit</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`update_form/${user.user_id}`)}
+              >
+                Edit
+              </DropdownMenuItem>
               <DropdownMenuItem>Delete</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -149,75 +192,83 @@ const UsersList = () => {
     <>
       <div className="flex items-center p-4">
         <div className="ml-auto flex items-center gap-2">
-           <div className="flex items-center space-x-2">
-              <Search className="w-5 h-5 text-muted-foreground" />
-              <Input
-                placeholder="Search medicines..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-            
+          <div className="flex items-center space-x-2">
+            <Search className="w-5 h-5 text-muted-foreground" />
+            <Input
+              placeholder="Search employees ..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64"
+            />
           </div>
 
-      
           <UserContentForm />
         </div>
       </div>
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-start ga">
-              <div className="flex flex-col">
-                <CardTitle className="text-[#492309]">Users</CardTitle>
-                <CardDescription>
-                  Manage your Users and view their profile.
-                </CardDescription>
-              </div>
-              <div>
-                <Select value={selectedPharmacy} onValueChange={setSelectedPharmacy}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Select Teams" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="All">All Teams</SelectItem>                                              
-                    {Teams.map(pharmacy => (
-                      <SelectItem key={pharmacy.id} value={pharmacy.name}>{pharmacy.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start ga">
+            <div className="flex flex-col">
+              <CardTitle className="text-[#492309]">Users</CardTitle>
+              <CardDescription>
+                Manage your Users and view their profile.
+              </CardDescription>
             </div>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="hidden w-[100px] sm:table-cell">
-                    <span className="sr-only">Image</span>
-                  </TableHead>  <TableHead>Name</TableHead>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Role
-                  </TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {renderTableContent()}
-              </TableBody>
-            </Table>
-          </CardContent>
-          <CardFooter>
-            <div className="text-sm text-muted-foreground">
-              Showing <strong>{(pagination.currentPage - 1) * pagination.limit + 1}-{Math.min(pagination.currentPage * pagination.limit, pagination.totalDocs)}</strong> of <strong>{pagination.totalDocs}</strong> Users
+            <div>
+              <Select
+                value={selectedPharmacy}
+                onValueChange={setSelectedPharmacy}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select Teams" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Teams</SelectItem>
+                  {Teams.map((pharmacy) => (
+                    <SelectItem key={pharmacy.id} value={pharmacy.name}>
+                      {pharmacy.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          </CardFooter>
-        </Card>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="hidden w-[100px] sm:table-cell"></TableHead>{' '}
+                <TableHead className="text-center">Image</TableHead>
+                <TableHead className="text-center">Employee name</TableHead>
+                <TableHead className="text-center">Salary</TableHead>
+                <TableHead className="text-center">Allowance</TableHead>
+                <TableHead className="hidden md:table-cell">Contact</TableHead>
+                <TableHead className="hidden md:table-cell">Address</TableHead>
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>{renderTableContent()}</TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <div className="text-sm text-muted-foreground">
+            Showing{' '}
+            <strong>
+              {(pagination.currentPage - 1) * pagination.limit + 1}-
+              {Math.min(
+                pagination.currentPage * pagination.limit,
+                pagination.totalDocs
+              )}
+            </strong>{' '}
+            of <strong>{pagination.totalDocs}</strong> Users
+          </div>
+        </CardFooter>
+      </Card>
     </>
-  )
-}
+  );
+};
 
-export default UsersList
+export default UsersList;

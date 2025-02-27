@@ -39,22 +39,20 @@ export function NavUser({
         'http://localhost:5000/api/auth/logout',
         {},
         {
-          headers: { Authorization: `Bearer ${Cookies.get('access_token')}` },
+          headers: {
+            Authorization: `Bearer ${Cookies.get('access_token')}`,
+          },
         }
       );
     } catch (error) {
       console.error('Logout failed', error);
     }
 
- 
     localStorage.removeItem('uid');
-    sessionStorage.removeItem('uid');
-    Cookies.remove('access_token');
-    Cookies.remove('role_name');
-    Cookies.remove('uid');
-    Cookies.remove('first_name');
+    localStorage.removeItem('first_name');
+    localStorage.removeItem('role_id');
+    localStorage.removeItem('email');
 
- 
     navigate('/');
   };
 
