@@ -1,4 +1,3 @@
-import '@/assets/agro.jpg';
 import * as React from 'react';
 import {
   BookOpen,
