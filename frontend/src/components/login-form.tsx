@@ -18,7 +18,7 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const render_url = process.env.render_url;
+  // const render_url = process.env.render_url;
 
   const handleLogin = async () => {
     setIsLoading(true);
