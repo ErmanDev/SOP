@@ -18,14 +18,14 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // const render_url = process.env.render_url;
+  const render_url = process.env.render_url;
 
   const handleLogin = async () => {
     setIsLoading(true);
     try {
       // try lang daw ihard code ang url diri
       const response = await axios.post(
-        `https://agropro-agritech-hr-management.onrender.com/api/auth/login`,
+        `${render_url}api/auth/login`,
         {
           email,
           password,
