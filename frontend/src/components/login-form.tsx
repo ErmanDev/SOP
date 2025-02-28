@@ -23,8 +23,9 @@ export function LoginForm({
   const handleLogin = async () => {
     setIsLoading(true);
     try {
+      // try lang daw ihard code ang url diri
       const response = await axios.post(
-        `${render_url}/api/auth/login`,
+        `https://agropro-agritech-hr-management.onrender.com/api/auth/login`,
         {
           email,
           password,
