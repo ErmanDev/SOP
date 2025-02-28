@@ -25,7 +25,7 @@ export function LoginForm({
     try {
       // try lang daw ihard code ang url diri
       const response = await axios.post(
-        `${render_url}api/auth/login`,
+        `${render_url}/api/auth/login`,
         {
           email,
           password,
