@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ Allow only requests from the frontend
-const allowedOrigins = [process.env.FRONTEND_URL || 'https://agropro-agritech-hr-management.vercel.app/'];
+const allowedOrigins = 'https://agropro-agritech-hr-management.vercel.app';
 
 app.use(cors({
     origin: allowedOrigins,
@@ -22,7 +22,7 @@ app.use(cors({
 app.use(express.json());
 
 // ✅ Health check route
-app.get('/api/health', (req, res) => {
+app.get('/api', (req, res) => {
     res.json({ status: 'success', message: 'Backend is running!' });
 });
 
