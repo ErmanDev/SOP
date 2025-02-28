@@ -8,7 +8,7 @@ const userRoleRoute = require('./routes/userRoleRoutes.js');
 const authRoute = require('./routes/authRoutes.js');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // ✅ Allow only requests from the frontend
 const allowedOrigins = 'https://agropro-agritech-hr-management.vercel.app';

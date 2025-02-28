@@ -18,11 +18,13 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const render_url = process.env.REACT_APP_RENDER_URL;
+
   const handleLogin = async () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:10000/api/auth/login',
+        `${render_url}/api/auth/login`,
         {
           email,
           password,
