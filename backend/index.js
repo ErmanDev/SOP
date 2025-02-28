@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // ✅ Allow only requests from the frontend
-const allowedOrigins = [process.env.FRONTEND_URL || 'https://vercel.com/trppypatas-projects/agropro-agritech-hr-management/3TW4fYoa252FsikdVxbHRa2583FH'];
+const allowedOrigins = [process.env.FRONTEND_URL || 'https://agropro-agritech-hr-management.vercel.app/'];
 
 app.use(cors({
     origin: allowedOrigins,
