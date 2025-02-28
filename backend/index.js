@@ -15,7 +15,7 @@ const allowedOrigins = 'https://agropro-agritech-hr-management.vercel.app';
 
 app.use(cors({
     origin: allowedOrigins,
-    methods: 'GET,POST,PUT,DELETE',
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
 }));
 
