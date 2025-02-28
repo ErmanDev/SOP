@@ -12,6 +12,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+//testing backend
+app.use("/", (req, res) => {
+  res.json({ message: "Welcome to the backend!" });
+});
+
 app.use('/api/users', userRoute);
 app.use('/api/userRoles', userRoleRoute);
 app.use('/api/auth', authRoute);
