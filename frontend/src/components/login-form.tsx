@@ -22,7 +22,7 @@ export function LoginForm({
     setIsLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:3000/api/auth/login',
+        'http://localhost:10000/api/auth/login',
         {
           email,
           password,
