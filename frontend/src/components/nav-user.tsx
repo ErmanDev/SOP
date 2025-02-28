@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const render_url = process.env.REACT_APP_RENDER_URL;
+const render_url = import.meta.env.REACT_APP_RENDER_URL;
 
 export function NavUser({
   user,

@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+// import dotenv from 'dotenv';
+// dotenv.config();
 
 export function LoginForm({
   className,
@@ -18,12 +20,13 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const render_url = process.env.render_url;
+  
+  const render_url = import.meta.env.VITE_render_url;
+  // console.log(render_url);
 
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      // try lang daw ihard code ang url diri
       const response = await axios.post(
         `${render_url}/api/auth/login`,
         {
