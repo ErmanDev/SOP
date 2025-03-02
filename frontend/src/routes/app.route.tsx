@@ -11,7 +11,7 @@ import PayrollPage from '@/modules/Admin/Payroll/payroll.page';
 import PayrollList from '@/modules/Admin/Payroll/payroll.list';
 import TechinicianList from '@/modules/Admin/Payroll/fts.payroll';
 import ManagerList from '@/modules/Admin/Payroll/asm.payrol';
-import ProtectedRoute from '@/modules/Auth/protected-route';
+import ProtectedRoute from '@/modules/Guard/protected-route';
 
 export const router = createBrowserRouter([
   {
@@ -27,7 +27,7 @@ export const router = createBrowserRouter([
 
   {
     path: '/dashboard-app',
-    Component: ProtectedRoute, 
+    element: <ProtectedRoute />,
     children: [
       {
         path: '',

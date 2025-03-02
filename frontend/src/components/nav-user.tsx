@@ -38,7 +38,7 @@ export function NavUser({
   const handleLogout = async () => {
     try {
       await axios.post(
-        `${render_url}/api/auth/logout`,
+        'http://localhost:3000/api/auth/logout',
         {},
         {
           headers: {
@@ -54,7 +54,11 @@ export function NavUser({
     localStorage.removeItem('first_name');
     localStorage.removeItem('role_id');
     localStorage.removeItem('email');
+    localStorage.removeItem('posiion');
+
     Cookies.remove('access_token');
+    Cookies.remove('profile_url');
+    Cookies.remove('user');
 
     navigate('/');
   };

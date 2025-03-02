@@ -36,8 +36,7 @@ const registerUser = async (req, res) => {
       status: status || 'active', 
       gender,
       email,
-      password: hashedPassword,
-      role_id: null || role_id,
+      password: hashedPassword
     });
 
     res.status(201).json({ message: 'User registered successfully'});
@@ -54,7 +53,7 @@ const loginUser = async (req, res) => {
 
     const user = await User.findOne({ 
       where: { email },
-      raw: true  
+      raw: true  // Get plain object
     });
 
     if (!user) {
@@ -62,36 +61,42 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // Log the found user (excluding sensitive data)
+    console.log('Found user:', {
+      id: user.user_id,
+      email: user.email,
+      position: user.position,
+      stored_password_length: user.password?.length
+    });
 
-   
+    // Log password comparison
     const match = await bcrypt.compare(password, user.password);
-    
+    console.log('Password comparison result:', match);
 
     if (!match) {
       console.log('Password mismatch for user:', email);
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-
+    // Check user status
     if (user.status === "inactive") {
       console.log('Inactive user attempted login:', email);
       return res.status(403).json({ error: "Account is inactive" });
     }
 
     const accessToken = createTokens(user);
-
+    console.log('Generated access token:', accessToken ? 'Token created' : 'Token creation failed');
 
     const responseData = {
       message: "Login successful",
       accessToken,
-      role_id: user.role_id,
-      uid: user.id,
+      uid: user.user_id,
       first_name: user.first_name,
-      email: user.email
-
+      position: user.position,
+      profile_url: user.profile_url
     };
     
- 
+    console.log('Sending successful response for user:', email);
     res.json(responseData);
 
   } catch (error) {

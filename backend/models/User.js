@@ -2,6 +2,11 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/sequelize.js');
 
 const User = sequelize.define('User', {
+    user_id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     first_name: {
         type: DataTypes.STRING,
         allowNull: true
@@ -16,7 +21,8 @@ const User = sequelize.define('User', {
     },
     suffix: {
         type: DataTypes.ENUM('jr', 'sr', 'ii', 'iii', 'iv'),
-        allowNull: true
+        allowNull: true,
+        defaultValue: null
     },
     email: {
         type: DataTypes.STRING,
@@ -43,14 +49,16 @@ const User = sequelize.define('User', {
         type: DataTypes.ENUM('male', 'female'),
         allowNull: true
     },
-    role_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-        references: {
-            model: 'user_roles',
-            key: 'role_id'
-        }
+    team: {
+        type: DataTypes.ENUM('north, south, east, west'),
+        allowNull: true
     },
+ 
+    profile_url: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: 'https://grammedia-vids.s3.ap-southeast-2.amazonaws.com/boy.png'
+    }
 }, {
     tableName: 'users',
     timestamps: true,

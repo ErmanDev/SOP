@@ -1,4 +1,3 @@
-
 import * as React from 'react';
 import {
   BookOpen,
@@ -10,7 +9,6 @@ import {
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
-
 import { NavUser } from '@/components/nav-user';
 import { TeamSwitcher } from '@/components/team-switcher';
 import {
@@ -20,6 +18,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import Cookies from 'js-cookie';
 
 const capitalizeWords = (str: string) => {
   return str
@@ -29,81 +28,85 @@ const capitalizeWords = (str: string) => {
     .join(' ');
 };
 
-const firstName = capitalizeWords(localStorage.getItem('first_name') || 'User');
-const email = localStorage.getItem('email') || 'example@gmail.com';
-
-const data = {
-  user: {
-    name: firstName,
-    email: email,
-    avatar: '../assets/logos.png',
-  },
-  teams: [
-    {
-      name: 'AGROPRO',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-  ],
-  navMain: [
-    {
-      title: 'Dashboard',
-      url: '/dashboard-app',
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: 'Employees',
-      url: 'users',
-      icon: PersonStanding,
-      items: [
-        {
-          title: 'Users',
-          url: 'users',
-        },
-
-        {
-          title: 'Cash Advance',
-          url: 'Cash-Advance',
-        },
-
-        {
-          title: 'Schedule',
-          url: '#',
-        },
-      ],
-    },
-
-    {
-      title: 'Attendance',
-      url: '#',
-      icon: Calendar,
-    },
-    {
-      title: 'Payroll',
-      url: '#',
-      icon: BookOpen,
-
-      items: [
-        {
-          title: 'Employee Payroll',
-          url: 'payroll',
-        },
-
-        {
-          title: 'Employee Funds',
-          url: 'funds',
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-    },
-  ],
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = React.useState({
+    name: 'User',
+    email: 'example@gmail.com',
+    avatar: '../assets/logos.png',
+  });
+
+  React.useEffect(() => {
+    const firstName = capitalizeWords(
+      localStorage.getItem('first_name') || 'User'
+    );
+    const email = localStorage.getItem('email') || 'example@gmail.com';
+    const avatar = Cookies.get('profile_url') || '../assets/logos.png';
+  
+    setUser({ name: firstName, email, avatar });
+  }, []);
+
+  const data = {
+    user,
+    teams: [
+      {
+        name: 'AGROPRO',
+        logo: GalleryVerticalEnd,
+        plan: 'Enterprise',
+      },
+    ],
+    navMain: [
+      {
+        title: 'Dashboard',
+        url: '/dashboard-app',
+        icon: LayoutDashboardIcon,
+      },
+      {
+        title: 'Employees',
+        url: 'users',
+        icon: PersonStanding,
+        items: [
+          {
+            title: 'Users',
+            url: 'users',
+          },
+          {
+            title: 'Cash Advance',
+            url: 'Cash-Advance',
+          },
+          {
+            title: 'Schedule',
+            url: '#',
+          },
+        ],
+      },
+      {
+        title: 'Attendance',
+        url: '#',
+        icon: Calendar,
+      },
+      {
+        title: 'Payroll',
+        url: '#',
+        icon: BookOpen,
+        items: [
+          {
+            title: 'Employee Payroll',
+            url: 'payroll',
+          },
+          {
+            title: 'Employee Funds',
+            url: 'funds',
+          },
+        ],
+      },
+      {
+        title: 'Settings',
+        url: '#',
+        icon: Settings2,
+      },
+    ],
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

@@ -8,8 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-// import dotenv from 'dotenv';
-// dotenv.config();
 
 export function LoginForm({
   className,
@@ -20,45 +18,50 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  
-  const render_url = import.meta.env.VITE_render_url;
-  // console.log(render_url);
-
   const handleLogin = async () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        `${render_url}/api/auth/login`,
-        {
-          email,
-          password,
-        }
+        'http://localhost:3000/api/auth/login',
+        { email, password }
       );
 
-      const { accessToken, role_id, uid, first_name } = response.data;
-
-      if (!response.data.accessToken) {
-        throw new Error('No access token received');
+      if (!response.data) {
+        throw new Error('Invalid server response');
       }
 
-      if (uid) {
-        Cookies.set('access_token', accessToken);
+      const { accessToken, uid, first_name, position, profile_url } =
+        response.data;
+
+      if (!accessToken || !uid) {
+        throw new Error(
+          response?.data?.error || 'Login failed. Please try again.'
+        );
+      }
+
+      const user = { accessToken, uid, first_name, position };
+
+      // Store user data securely
+      Cookies.set('access_token', accessToken, { expires: 1 });
+      Cookies.set('user', JSON.stringify(user), { expires: 1 });
+      Cookies.set('profile_url', profile_url, { expires: 1 });
+
+      try {
         localStorage.setItem('uid', uid.toString());
         localStorage.setItem('first_name', first_name);
-        localStorage.setItem('role_id', role_id.toString());
         localStorage.setItem('email', email);
-        sessionStorage.setItem('uid', uid.toString());
-        sessionStorage.setItem('first_name', first_name);
-        sessionStorage.setItem('role_id', role_id.toString());
-        sessionStorage.setItem('email', email);
-
-        navigate('/dashboard-app');
-        toast.success('Login successful');
-      } else {
-        toast.error(response?.data?.error);
+        localStorage.setItem('position', position);
+      } catch (storageError) {
+        console.warn('Storage error:', storageError);
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.error || error.message;
+
+      toast.success('Login successful');
+      navigate('/dashboard-app');
+    } catch (error) {
+      console.error('Login error:', error);
+      const errorMessage =
+        (axios.isAxiosError(error) && error.response?.data?.error) ||
+        'An unexpected error occurred. Please try again.';
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -67,11 +70,15 @@ export function LoginForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error('Please fill in both fields');
+      return;
+    }
     handleLogin();
   };
 
   return (
-    <div className={className} {...props}>
+    <div className={`${className} overflow-hidden `} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -109,9 +116,7 @@ export function LoginForm({
               </Button>
             </div>
           </form>
-          <div className="relative hidden bg-muted md:block">
-
-          </div>
+          <div className="relative hidden bg-muted md:block"></div>
         </CardContent>
       </Card>
       <div className="text-center text-xs text-muted-foreground mt-5">
