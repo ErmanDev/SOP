@@ -70,12 +70,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: 'users',
           },
           {
-            title: 'Cash Advance',
+            title: 'Deductions',
             url: 'Cash-Advance',
-          },
-          {
-            title: 'Schedule',
-            url: '#',
           },
         ],
       },
