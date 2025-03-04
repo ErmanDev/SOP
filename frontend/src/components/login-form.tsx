@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { InputPassword } from './ui/input-password';
+import { logo } from '@/assets/image';
 
 export function LoginForm({
   className,
@@ -37,6 +39,10 @@ export function LoginForm({
         throw new Error(
           response?.data?.error || 'Login failed. Please try again.'
         );
+      }
+      if (!['hr'].includes(position)) {
+        toast.error('Unauthorized Access');
+        return;
       }
 
       const user = { accessToken, uid, first_name, position };
@@ -102,7 +108,7 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
+                <InputPassword
                   id="password"
                   type="password"
                   placeholder="*******"
@@ -116,7 +122,9 @@ export function LoginForm({
               </Button>
             </div>
           </form>
-          <div className="relative hidden bg-muted md:block"></div>
+          <div className="relative hidden bg-muted md:block">
+            <img src={logo} alt="" />
+          </div>
         </CardContent>
       </Card>
       <div className="text-center text-xs text-muted-foreground mt-5">

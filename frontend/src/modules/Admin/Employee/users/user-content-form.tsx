@@ -15,7 +15,7 @@ import { useAddUser } from './hooks/useAddUser';
 import UserForm from './user-form';
 
 const userSchema = z.object({
-  firstName: z
+  first_name: z
     .string()
     .min(2, {
       message: 'First Name must be at least 2 characters.',
@@ -23,7 +23,7 @@ const userSchema = z.object({
     .max(30, {
       message: 'First Name must not be longer than 30 characters.',
     }),
-  lastName: z
+  last_name: z
     .string()
     .min(2, {
       message: 'Last Name must be at least 2 characters.',
@@ -31,7 +31,8 @@ const userSchema = z.object({
     .max(30, {
       message: 'Last Name must not be longer than 30 characters.',
     }),
-  middleName: z.string().optional(),
+
+  middle_name: z.string().optional(),
 
   email: z
     .string({
@@ -48,20 +49,26 @@ const userSchema = z.object({
     .max(30, {
       message: 'Password must not be longer than 30 characters.',
     }),
-  userRole: z.string({
+  position: z.string({
     required_error: 'This field is required.',
   }),
-  userImg: z.any(),
+  profile_url: z.any(),
+  emergency_contact: z.any({
+    required_error: 'Emergency contact is required',
+  }),
+  address: z.string({}).optional(),
 });
 
 const defaultValues = {
-  firstName: '',
-  lastName: '',
-  middleName: '',
-  userImg: undefined,
+  first_name: '',
+  last_name: '',
+  middle_name: '',
+  profile_url: undefined,
+  address: '',
+  emergency_contact: '',
   password: '',
   email: '',
-  userRole: '',
+  position: '',
 };
 
 export type UserFormValues = z.infer<typeof userSchema>;
@@ -86,22 +93,26 @@ const UserContentForm = () => {
   ) => {
     try {
       const {
-        firstName,
-        lastName,
-        middleName,
-        userRole,
-        userImg,
-        password,
+        first_name,
+        last_name,
+        middle_name,
         email,
+        password,
+        profile_url,
+        address,
+        emergency_contact,
+        position,
       } = data;
       const userData = {
-        firstName,
-        lastName,
-        middleName,
+        first_name,
+        last_name,
+        middle_name,
         email,
         password,
-        userImg,
-        userRole,
+        profile_url,
+        address,
+        emergency_contact,
+        position,
         confirmPassword: data.password,
       };
 
@@ -121,7 +132,7 @@ const UserContentForm = () => {
     <Sheet onOpenChange={setIsOpen} open={isOpen}>
       <SheetTrigger asChild>
         <Button
-          className="h-8 gap-1 bg-[#0B0400]"
+          className="h-8 gap-1 "
           size="sm"
           variant="default"
           onClick={() => setIsOpen(true)}
@@ -153,7 +164,7 @@ const UserContentForm = () => {
             disabled={isAddingUser}
             onClick={form.handleSubmit(onSubmit)}
           >
-            {isAddingUser ? 'Creating User...' : 'Creadte User'}
+            {isAddingUser ? 'Creating User...' : 'Create User'}
             {/* Add User */}
           </Button>
         </SheetFooter>

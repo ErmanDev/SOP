@@ -9,6 +9,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { InputPassword } from '@/components/ui/input-password';
 import {
   Select,
   SelectContent,
@@ -135,14 +136,26 @@ export const UserForm = ({ form }: any) => {
 
           <FormField
             control={form.control}
-            name="lastName"
+            name="salary"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
                   Salary <span className="text-red-600">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="0.00" {...field} />
+                  <Input
+                    type="number"
+                    step="0.01" // Allows decimals
+                    min="0"
+                    placeholder="0.00"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*\.?\d*$/.test(value)) {
+                        field.onChange(value);
+                      }
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -150,7 +163,6 @@ export const UserForm = ({ form }: any) => {
           />
 
           <FormField
-            control={form.control}
             name="password"
             render={({ field }) => (
               <FormItem>
@@ -158,7 +170,38 @@ export const UserForm = ({ form }: any) => {
                   Password <span className="text-red-600">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="" type="password" {...field} />
+                  <InputPassword
+                    placeholder=""
+                    type="password"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Confirm Password <span className="text-red-600">*</span>
+                </FormLabel>
+                <FormControl>
+                  <InputPassword
+                    placeholder=""
+                    type="password"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

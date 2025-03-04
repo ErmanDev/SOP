@@ -37,9 +37,9 @@ const User = sequelize.define('User', {
         allowNull: false
     },
     position: {
-        type: DataTypes.ENUM('hr', 'manager', 'technician'),
+        type: DataTypes.ENUM('hr', 'manager', 'technical'),
         allowNull: true
-    },
+    }, 
     status: {
         type: DataTypes.ENUM('active', 'inactive'),
         allowNull: false,
@@ -50,7 +50,7 @@ const User = sequelize.define('User', {
         allowNull: true
     },
     team: {
-        type: DataTypes.ENUM('north, south, east, west'),
+        type: DataTypes.ENUM('north, south'),
         allowNull: true
     },
  

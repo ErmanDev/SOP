@@ -16,12 +16,12 @@ export default interface IUser {
   user_id?: string;
 
 
-  firstName: string;
-  lastName: string;
-  middleName?: string;
+  first_name: string;
+  last_name: string;
+  middle_name?: string;
   address: string;
-  emergencyContacts: IEmergencyContact;
-  userImg?: string | File;
+  emergency_contact: IEmergencyContact;
+  profile_url?: string | File;
 
   email: string;
   password: string;

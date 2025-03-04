@@ -141,16 +141,16 @@ const UsersList = () => {
       <TableRow key={user.id}>
         <TableCell className="hidden sm:table-cell">
           <img
-            alt={`${user.firstName}'s avatar`}
+            alt={`${user.first_name}'s avatar`}
             className="aspect-square rounded-md object-cover"
             height="64"
-            src={user.userImg as string}
+            src={user.profile_url as string}
             width="64"
           />
         </TableCell>
         <TableCell className="font-light">
           <span className="text-md font-bold">
-            {user.firstName} {user.lastName}
+            {user.first_name} {user.last_name}
           </span>{' '}
           <br />
           <span className="text-xs">{user.email}</span>
