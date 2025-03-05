@@ -124,8 +124,7 @@ export const UserForm = ({ form }: any) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="admin">HR</SelectItem>
-                    <SelectItem value="cashier">Manager</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
                     <SelectItem value="technician">Technician</SelectItem>
                   </SelectContent>
                 </Select>
@@ -184,29 +183,7 @@ export const UserForm = ({ form }: any) => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Confirm Password <span className="text-red-600">*</span>
-                </FormLabel>
-                <FormControl>
-                  <InputPassword
-                    placeholder=""
-                    type="password"
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+     
         </form>
       </Form>
     </div>
