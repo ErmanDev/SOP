@@ -77,7 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       },
       {
         title: 'Attendance',
-        url: '#',
+        url: 'Attendance',
         icon: Calendar,
       },
       {

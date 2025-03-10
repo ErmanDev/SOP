@@ -6,12 +6,13 @@ import DashboardPage from '@/modules/Admin/Dashboard/dashboard.page';
 import OverviewDashboard from '@/modules/Admin/Dashboard/overviewDashboard.page';
 import UserPage from '@/modules/Admin/Employee/users/users.page';
 import UsersList from '@/modules/Admin/Employee/users/user-list';
-import CashPage from '@/modules/Admin/Employee/Cash Advance/cash-page';
+import CashPage from '@/modules/Admin/Employee/Deductions/deduction-page';
 import PayrollPage from '@/modules/Admin/Payroll/payroll.page';
 import PayrollList from '@/modules/Admin/Payroll/payroll.list';
 import TechinicianList from '@/modules/Admin/Payroll/fts.payroll';
 import ManagerList from '@/modules/Admin/Payroll/asm.payrol';
 import ProtectedRoute from '@/modules/Guard/protected-route';
+import AttendancePage from '@/modules/Admin/Attendance/attendance';
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +55,20 @@ export const router = createBrowserRouter([
           {
             path: 'users',
             Component: UserPage,
+            children: [
+              {
+                index: true,
+                Component: UsersList,
+              },
+              {
+                path: 'users-list',
+                Component: UsersList,
+              },
+            ],
+          },
+          {
+            path: 'attendance',
+            Component: AttendancePage,
             children: [
               {
                 index: true,
