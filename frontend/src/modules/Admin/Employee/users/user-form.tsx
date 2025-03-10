@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-
 import { Label } from '@/components/ui/label';
 
 // Component initialization
@@ -27,8 +26,6 @@ import { Label } from '@/components/ui/label';
 export const UserForm = ({ form }: any) => {
   const { setFocus, setValue, formState } = form;
   const { errors } = formState;
-
-
 
   return (
     <div className="p-5">
@@ -189,7 +186,7 @@ export const UserForm = ({ form }: any) => {
                   Contact <span className="text-red-600">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input placeholder="Cruz" {...field} />
+                  <Input placeholder="09** *** ****" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

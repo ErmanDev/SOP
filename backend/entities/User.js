@@ -76,7 +76,7 @@ const User = sequelize.define(
       unique: true, 
     },
     address: {
-      type: DataTypes.TEXT,
+      type: DataTypes.STRING,
       allowNull: true,
     },
   },

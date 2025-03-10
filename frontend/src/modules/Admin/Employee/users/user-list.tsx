@@ -128,7 +128,10 @@ const UsersList = () => {
     if (memoUsers.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={8} className="h-[400px] text-center">
+          <TableCell
+            colSpan={8}
+            className="h-[400px] text-center text-md text-red"
+          >
             No users found.
           </TableCell>
         </TableRow>
@@ -160,7 +163,7 @@ const UsersList = () => {
           <span className=" font-bold text-md">{user.allowance}</span>
         </TableCell>
         <TableCell className="font-light text-center">
-          <span className=" font-bold text-md">{user.contact}</span>
+          <span className="  text-md">{user.contact}</span>
         </TableCell>
         <TableCell className="font-light text-center">
           <span className=" font-bold text-md">{user.address}</span>

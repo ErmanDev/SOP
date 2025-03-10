@@ -122,10 +122,11 @@ export default function OverviewDashboard() {
         <StatCard
           icon={<PersonIcon className="h-4 w-4" />}
           title="Total Employees"
-          value={
-            totalUsers !== null && totalUsers !== undefined
-              ? totalUsers.toString()
-              : 'Loading...'
+          value={totalUsers?.toString() ?? 'Loading...'}
+          trend={
+            typeof previousUsers !== 'undefined' && previousUsers > 0
+              ? ((totalUsers - previousUsers) / previousUsers) * 100
+              : 'No previous data'
           }
         />
 

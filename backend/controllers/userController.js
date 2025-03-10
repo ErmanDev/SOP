@@ -1,5 +1,6 @@
 const user = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const pool = require('../config/db');
 
 const fetchAllUsers = async (req, res) => {  // ✅ Fixed: Added req
   try {
