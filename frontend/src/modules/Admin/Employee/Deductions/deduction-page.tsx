@@ -1,16 +1,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/sr-tabs";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import UsersList from "../users/user-list";
+import DeductionList from "./deduction.lists";
 
-const CashPage = () => {
+const DeductionPage = () => {
   const location = useLocation();
   const currentTab = location.pathname.split("/").pop(); // Get current tab based on the route
 
   return (
-    <Tabs defaultValue="users-list">
+    <Tabs defaultValue="deductions">
       <div className="flex items-center">
         <TabsList>
-          <Link to={'users-list'}>
+          <Link to={'deductions'}>
+            <TabsTrigger value="deductions">Deductions</TabsTrigger>
             <TabsTrigger value="users-list">All</TabsTrigger>
           </Link>
             
@@ -20,12 +22,12 @@ const CashPage = () => {
         </TabsList>
       </div>
 
-        <TabsContent value={currentTab as string === "users" ? "users-list" : currentTab as string}>
-          {currentTab === 'users' ? <UsersList /> : <Outlet />}
+        <TabsContent value={currentTab as string === "deduction" ? "deduction-list" : currentTab as string}>
+          {currentTab === 'deductions' ? <DeductionList /> : <Outlet />}
 
         </TabsContent>
     </Tabs>
   )
 }
 
-export default CashPage
+export default DeductionPage

@@ -71,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           },
           {
             title: 'Deductions',
-            url: 'Cash-Advance',
+            url: 'deductions',
           },
         ],
       },

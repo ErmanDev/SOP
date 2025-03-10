@@ -6,13 +6,14 @@ import DashboardPage from '@/modules/Admin/Dashboard/dashboard.page';
 import OverviewDashboard from '@/modules/Admin/Dashboard/overviewDashboard.page';
 import UserPage from '@/modules/Admin/Employee/users/users.page';
 import UsersList from '@/modules/Admin/Employee/users/user-list';
-import CashPage from '@/modules/Admin/Employee/Deductions/deduction-page';
 import PayrollPage from '@/modules/Admin/Payroll/payroll.page';
 import PayrollList from '@/modules/Admin/Payroll/payroll.list';
 import TechinicianList from '@/modules/Admin/Payroll/fts.payroll';
 import ManagerList from '@/modules/Admin/Payroll/asm.payrol';
 import ProtectedRoute from '@/modules/Guard/protected-route';
 import AttendancePage from '@/modules/Admin/Attendance/attendance';
+import DeductionPage from '@/modules/Admin/Employee/Deductions/deduction-page';
+import DeductionList from '@/modules/Admin/Employee/Deductions/deduction.lists';
 
 export const router = createBrowserRouter([
   {
@@ -81,16 +82,16 @@ export const router = createBrowserRouter([
             ],
           },
           {
-            path: 'cash-advance',
-            Component: CashPage,
+            path: 'deductions',
+            Component: DeductionPage,
             children: [
               {
                 index: true,
-                Component: UsersList,
+                Component: DeductionList,
               },
               {
-                path: 'users-list',
-                Component: UsersList,
+                path: 'deduction-list',
+                Component: DeductionList,
               },
             ],
           },
