@@ -27,7 +27,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -41,6 +41,7 @@ import {
 } from 'recharts';
 import { StatCardProps } from './types';
 import { PersonIcon } from '@radix-ui/react-icons';
+import axios from 'axios';
 
 const medicineAvailabilityData = [
   { month: 'Jan', pharmacy1: 12, pharmacy2: 90, pharmacy3: 75 },
@@ -83,6 +84,22 @@ const medicineChartConfig = {
 
 export default function OverviewDashboard() {
   const [timeRange, setTimeRange] = useState('6m');
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTotalUsers = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:3000/api/users/countUsers'
+        );
+        setTotalUsers(response.data.totalUsers);
+      } catch (error) {
+        console.error('Error fetching total users:', error);
+      }
+    };
+
+    fetchTotalUsers();
+  }, []);
 
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 bg-background">
@@ -105,7 +122,11 @@ export default function OverviewDashboard() {
         <StatCard
           icon={<PersonIcon className="h-4 w-4" />}
           title="Total Employees"
-          value="867"
+          value={
+            totalUsers !== null && totalUsers !== undefined
+              ? totalUsers.toString()
+              : 'Loading...'
+          }
         />
 
         <StatCard

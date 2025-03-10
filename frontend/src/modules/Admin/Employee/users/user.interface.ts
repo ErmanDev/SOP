@@ -1,10 +1,16 @@
+import { StringValidation } from "zod";
+
 export default interface IUser {
   employeeId: string;
+  employee_name: string;
   department: string;
   position: string;
-  basicSalary: string;
+  profile_url: string;
+  status: string;
+
+  
   overtime: string;
-  allowances: string;
+  allowance: number;
   deductions: string;
   epf: string;
   socso: string;
@@ -19,9 +25,10 @@ export default interface IUser {
   first_name: string;
   last_name: string;
   middle_name?: string;
+  salary: number;
   address: string;
-  emergency_contact: IEmergencyContact;
-  profile_url?: string | File;
+  contact: IEmergencyContact;
+
 
   email: string;
   password: string;
@@ -35,5 +42,5 @@ export default interface IUser {
 
 interface IEmergencyContact {
   name: string;
-  contactNumber: number;
+  contactNumber: string
 }

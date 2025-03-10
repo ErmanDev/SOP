@@ -31,8 +31,20 @@ const getAllUsers = async () => {
   }
 }
 
+const getAllUser = async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/api/users/fetchUserDetails");
+    return response.data; // ✅ Return the full response to handle it properly
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    return { data: [] }; // ✅ Prevents crashes
+  }
+};
+
+
 export {
   addUser,
-  getAllUsers
+  getAllUsers,
+  getAllUser
 };
 

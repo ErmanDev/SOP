@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors'); // Add this line
 const userRoute = require( './routes/userRoutes.js');
 const authRoute = require('./routes/authRoutes.js');
+const uploadRoute = require('./routes/uploadRoutes.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cors()); 
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/upload', uploadRoute);
 
 (async () => {
   try {

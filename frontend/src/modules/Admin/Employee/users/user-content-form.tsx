@@ -52,6 +52,15 @@ const userSchema = z.object({
   position: z.string({
     required_error: 'This field is required.',
   }),
+  salary: z.number({
+    required_error: 'There is no zero value',
+  }),
+  allowance: z.number({
+    required_error: 'There is no zero value',
+  }),
+  contact: z.string({
+    required_error: 'Contact is required',
+  }),
   profile_url: z.any(),
   emergency_contact: z.any({
     required_error: 'Emergency contact is required',
@@ -69,6 +78,8 @@ const defaultValues = {
   password: '',
   email: '',
   position: '',
+  contact: '',
+  allowance: '',
 };
 
 export type UserFormValues = z.infer<typeof userSchema>;
@@ -100,8 +111,10 @@ const UserContentForm = () => {
         password,
         profile_url,
         address,
-        emergency_contact,
+        contact,
         position,
+        salary,
+        allowance,
       } = data;
       const userData = {
         first_name,
@@ -111,8 +124,10 @@ const UserContentForm = () => {
         password,
         profile_url,
         address,
-        emergency_contact,
+        contact,
         position,
+        salary,
+        allowance,
         confirmPassword: data.password,
       };
 

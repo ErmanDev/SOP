@@ -39,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { focusManager } from '@tanstack/react-query';
 
 // Assume these functions make API calls to your backend
 
@@ -47,13 +48,21 @@ import {
 //   return path.split('.').reduce((acc, part) => acc && acc[part] !== undefined ? acc[part] : undefined, obj);
 // };
 type RoleColor = {
-  [key in 'admin' | 'staff' | 'visitor']: string;
+  [key in 'admin' | 'manager' | 'technician']: string;
 };
 
 const roleColors: RoleColor = {
   admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  staff: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  visitor: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  manager:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  technician:
+    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+};
+
+const statusVariant = {
+  active: 'success',
+  inactive: 'destructive',
+  suspended: 'secondary',
 };
 
 const RoleBadge = ({ role }: { role: string }) => {
@@ -71,45 +80,34 @@ const RoleBadge = ({ role }: { role: string }) => {
 
 const UsersList = () => {
   const navigate = useNavigate();
-  const [selectedPharmacy, setSelectedPharmacy] = useState<string>('All');
+  const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const { data: usersData, isLoading, error } = useReadUsers();
-  const Teams = [
-    {
-      id: 1,
-      name: 'North Team',
-      address: '123 Health St',
-      phone: '555-0101',
-      hours: '8AM - 10PM',
-    },
-    {
-      id: 2,
-      name: 'South Team',
-      address: '456 Wellness Ave',
-      phone: '555-0202',
-      hours: '24/7',
-    },
-  ];
+  const { data: userDetails, isLoading, error } = useReadUsers();
 
   const memoUsers = useMemo(() => {
-    return usersData?.data?.users || [];
-  }, [usersData]);
+    if (!Array.isArray(userDetails)) return [];
 
-  const pagination = useMemo(
-    () => ({
-      currentPage: usersData?.data?.currentPage?.page || 1,
-      totalPages: usersData?.data?.totalPages || 1,
-      totalDocs: usersData?.data?.totalDocs || 0,
-      limit: usersData?.data?.currentPage?.limit || 20,
-    }),
-    [usersData]
-  );
+    return userDetails
+      .filter((user: IUser) => user.position?.toLowerCase() !== 'hr')
+      .filter((user: IUser) =>
+        user.employee_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+  }, [userDetails, searchTerm]);
+
+  const pagination = useMemo(() => {
+    const currentPage = userDetails?.data?.currentPage?.page || 1;
+    const totalPages = userDetails?.data?.totalPages || 1;
+    const totalDocs = userDetails?.data?.totalDocs || 0;
+    const limit = userDetails?.data?.currentPage?.limit || 20;
+
+    return { currentPage, totalPages, totalDocs, limit };
+  }, [userDetails]);
 
   const renderTableContent = () => {
     if (isLoading) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center">
+          <TableCell colSpan={8} className="h-[400px] text-center">
             <Spinner className="mx-auto" />
             <span className="sr-only">Loading users...</span>
           </TableCell>
@@ -120,17 +118,17 @@ const UsersList = () => {
     if (error) {
       return (
         <TableRow>
-          <TableCell colSpan={6} className="h-[400px] text-center text-red-500">
+          <TableCell colSpan={8} className="h-[400px] text-center text-red-500">
             Error loading users. Please try again later.
           </TableCell>
         </TableRow>
       );
     }
 
-    if (!memoUsers || memoUsers.length === 0) {
+    if (memoUsers.length === 0) {
       return (
         <TableRow>
-          <TableCell colSpan={8} className="h-[400px]  text-center">
+          <TableCell colSpan={8} className="h-[400px] text-center">
             No users found.
           </TableCell>
         </TableRow>
@@ -138,51 +136,42 @@ const UsersList = () => {
     }
 
     return memoUsers.map((user: IUser) => (
-      <TableRow key={user.id}>
-        <TableCell className="hidden sm:table-cell">
+      <TableRow key={user.user_id}>
+        <TableCell className="sm:table-cell  flex justify-center items-center">
           <img
             alt={`${user.first_name}'s avatar`}
             className="aspect-square rounded-md object-cover"
             height="64"
-            src={user.profile_url as string}
+            src={
+              user.profile_url ||
+              'https://grammedia-vids.s3.ap-southeast-2.amazonaws.com/boy.png'
+            }
             width="64"
           />
         </TableCell>
-        <TableCell className="font-light">
-          <span className="text-md font-bold">
-            {user.first_name} {user.last_name}
-          </span>{' '}
-          <br />
-          <span className="text-xs">{user.email}</span>
-        </TableCell>
-        <TableCell>
-          <Badge variant="outline">Active</Badge>
-        </TableCell>
-        <TableCell className="hidden md:table-cell">
-          <RoleBadge role={user.userRole || 'admin'} />
-        </TableCell>
 
-        <TableCell>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                aria-label={`Actions for ${user.email}`}
-                size="icon"
-                variant="ghost"
-              >
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigate(`update_form/${user.user_id}`)}
-              >
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem>Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <TableCell className="font-light text-center">
+          <span className=" font-bold text-md">{user.employee_name}</span>
+        </TableCell>
+        <TableCell className="font-light text-center">
+          <span className=" font-bold text-md">{user.salary}</span>
+        </TableCell>
+        <TableCell className="font-light text-center">
+          <span className=" font-bold text-md">{user.allowance}</span>
+        </TableCell>
+        <TableCell className="font-light text-center">
+          <span className=" font-bold text-md">{user.contact}</span>
+        </TableCell>
+        <TableCell className="font-light text-center">
+          <span className=" font-bold text-md">{user.address}</span>
+        </TableCell>
+        <TableCell className="text-center">
+          <RoleBadge role={user.position} />
+        </TableCell>
+        <TableCell className="text-center">
+          <Badge variant={statusVariant[user.status] || 'outline'}>
+            {user.status}
+          </Badge>
         </TableCell>
       </TableRow>
     ));
@@ -215,20 +204,14 @@ const UsersList = () => {
               </CardDescription>
             </div>
             <div>
-              <Select
-                value={selectedPharmacy}
-                onValueChange={setSelectedPharmacy}
-              >
+              <Select value={selectedTeam} onValueChange={setSelectedTeam}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select Teams" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="All">All Teams</SelectItem>
-                  {Teams.map((pharmacy) => (
-                    <SelectItem key={pharmacy.id} value={pharmacy.name}>
-                      {pharmacy.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="north">North Team</SelectItem>
+                  <SelectItem value="south">South Team</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -238,16 +221,18 @@ const UsersList = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="hidden w-[100px] sm:table-cell"></TableHead>{' '}
                 <TableHead className="text-center">Image</TableHead>
                 <TableHead className="text-center">Employee name</TableHead>
                 <TableHead className="text-center">Salary</TableHead>
                 <TableHead className="text-center">Allowance</TableHead>
-                <TableHead className="hidden md:table-cell">Contact</TableHead>
-                <TableHead className="hidden md:table-cell">Address</TableHead>
-                <TableHead>
-                  <span className="sr-only">Actions</span>
+                <TableHead className="hidden md:table-cell text-center">
+                  Contact
                 </TableHead>
+                <TableHead className="hidden md:table-cell text-center">
+                  Address
+                </TableHead>
+                <TableHead className="text-center">Position</TableHead>
+                <TableHead className="text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>{renderTableContent()}</TableBody>

@@ -17,9 +17,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { generatePassword } from '@/shared/generateRandomPassword';
-import { useEffect } from 'react';
+
+
+import { Label } from '@/components/ui/label';
 
 // Component initialization
 
@@ -28,15 +28,7 @@ export const UserForm = ({ form }: any) => {
   const { setFocus, setValue, formState } = form;
   const { errors } = formState;
 
-  useEffect(() => {
-    // If there are errors, focus on the first field that has an error
-    if (Object.keys(errors).length > 0) {
-      const firstErrorKey = Object.keys(errors)[0]; // Get the first error key
-      setFocus(firstErrorKey); // Automatically focus on the first error field
-    }
 
-    setValue('password', generatePassword());
-  }, [errors, setFocus]);
 
   return (
     <div className="p-5">
@@ -44,7 +36,7 @@ export const UserForm = ({ form }: any) => {
         <form className="space-y-8">
           <FormField
             control={form.control}
-            name="firstName"
+            name="first_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -60,7 +52,7 @@ export const UserForm = ({ form }: any) => {
 
           <FormField
             control={form.control}
-            name="middleName"
+            name="middle_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Middle Name</FormLabel>
@@ -74,7 +66,7 @@ export const UserForm = ({ form }: any) => {
 
           <FormField
             control={form.control}
-            name="lastName"
+            name="last_name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -108,7 +100,7 @@ export const UserForm = ({ form }: any) => {
 
           <FormField
             control={form.control}
-            name="userRole"
+            name="position"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
@@ -160,6 +152,69 @@ export const UserForm = ({ form }: any) => {
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="allowance"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Allowance <span className="text-red-600">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.01" // Allows decimals
+                    min="0"
+                    placeholder="0.00"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^\d*\.?\d*$/.test(value)) {
+                        field.onChange(value);
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="contact"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Contact <span className="text-red-600">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="Cruz" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Address <span className="text-red-600">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="Cruz" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="picture">Image</Label>
+            <Input id="picture" type="file" />
+          </div>
 
           <FormField
             name="password"
@@ -183,7 +238,6 @@ export const UserForm = ({ form }: any) => {
               </FormItem>
             )}
           />
-     
         </form>
       </Form>
     </div>

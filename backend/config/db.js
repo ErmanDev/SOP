@@ -1,32 +1,30 @@
-const { Sequelize } = require('sequelize');
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
+const pkg = require("pg");
 
 dotenv.config();
+const { Pool } = pkg;
 
 if (!process.env.DATABASE_URL) {
-  throw new Error('❌ DATABASE_URL is missing from .env file');
+  throw new Error("❌ DATABASE_URL is missing from .env file");
 }
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-  dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // Required for Render-hosted databases
-    },
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, 
   },
-  logging: false, // Disable query logging for cleaner output
 });
 
 const testConnection = async () => {
   try {
-    await sequelize.authenticate();
-    console.log('✅ Connected to Render PostgreSQL database!');
+    const client = await pool.connect();
+    console.log("✅ Connected to Render PostgreSQL database!");
+    client.release();
   } catch (error) {
-    console.error('❌ Database connection error:', error);
+    console.error("❌ Database connection error:", error);
   }
 };
 
 testConnection();
 
-module.exports = sequelize;
+module.exports = pool; 

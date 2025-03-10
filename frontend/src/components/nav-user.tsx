@@ -52,7 +52,7 @@ export function NavUser({
 
     localStorage.removeItem('uid');
     localStorage.removeItem('first_name');
-    localStorage.removeItem('role_id');
+
     localStorage.removeItem('email');
     localStorage.removeItem('posiion');
 

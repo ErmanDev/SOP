@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
-const User = require('../models/User');
+const User = require('../entities/User');
 const {createTokens} = require('../middlewares/jwt');
 
 
 const registerUser = async (req, res) => {
   try {
-    const { first_name, middle_name, last_name, suffix, position, status, gender, email, password, role_id } = req.body;
+    const { first_name, middle_name, last_name, suffix, position, status, gender, email, password, salary, allowance, contact, address } = req.body;
 
     
     const existingUser = await User.findOne({ where: { email } });
@@ -36,7 +36,11 @@ const registerUser = async (req, res) => {
       status: status || 'active', 
       gender,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      salary,
+      allowance,
+       contact,
+        address
     });
 
     res.status(201).json({ message: 'User registered successfully'});
@@ -53,7 +57,7 @@ const loginUser = async (req, res) => {
 
     const user = await User.findOne({ 
       where: { email },
-      raw: true  // Get plain object
+      raw: true  
     });
 
     if (!user) {
@@ -61,7 +65,6 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ error: "Invalid email or password" });
     }
 
-    // Log the found user (excluding sensitive data)
     console.log('Found user:', {
       id: user.user_id,
       email: user.email,
