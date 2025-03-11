@@ -43,6 +43,9 @@ import { StatCardProps } from './types';
 import { PersonIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 
+
+const render_url = import.meta.env.VITE_render_url;
+
 const medicineAvailabilityData = [
   { month: 'Jan', pharmacy1: 12, pharmacy2: 90, pharmacy3: 75 },
   { month: 'Feb', pharmacy1: 85, pharmacy2: 88, pharmacy3: 78 },
@@ -90,7 +93,7 @@ export default function OverviewDashboard() {
     const fetchTotalUsers = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:3000/api/users/countUsers'
+          `${render_url}/api/users/countUsers`
         );
         setTotalUsers(response.data.totalUsers);
       } catch (error) {
@@ -123,11 +126,7 @@ export default function OverviewDashboard() {
           icon={<PersonIcon className="h-4 w-4" />}
           title="Total Employees"
           value={totalUsers?.toString() ?? 'Loading...'}
-          trend={
-            typeof previousUsers !== 'undefined' && previousUsers > 0
-              ? ((totalUsers - previousUsers) / previousUsers) * 100
-              : 'No previous data'
-          }
+        
         />
 
         <StatCard

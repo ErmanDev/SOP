@@ -1,5 +1,7 @@
 import axios from "axios";
 import IUser from "../user.interface";
+
+const render_url = import.meta.env.VITE_render_url;
  
 const addUser = async (user:  Partial<IUser>) => {
   try {
@@ -33,7 +35,7 @@ const getAllUsers = async () => {
 
 const getAllUser = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/api/users/fetchUserDetails");
+    const response = await axios.get(`${render_url}/api/users/fetchUserDetails`);
     return response.data; // ✅ Return the full response to handle it properly
   } catch (err) {
     console.error("Error fetching users:", err);

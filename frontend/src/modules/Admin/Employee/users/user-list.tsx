@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+
 import {
   Card,
   CardContent,
@@ -16,15 +16,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontalIcon, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+
 import IUser from './user.interface';
 
 import { Spinner } from '@/components/spinner';
@@ -39,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { focusManager } from '@tanstack/react-query';
+
 
 // Assume these functions make API calls to your backend
 
@@ -79,7 +73,7 @@ const RoleBadge = ({ role }: { role: string }) => {
 };
 
 const UsersList = () => {
-  const navigate = useNavigate();
+
   const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const { data: userDetails, isLoading, error } = useReadUsers();
