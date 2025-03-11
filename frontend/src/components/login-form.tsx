@@ -10,13 +10,10 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { InputPassword } from './ui/input-password';
 import { logo } from '@/assets/image';
-import dotenv from 'dotenv';
-dotenv.config();
 
 export function LoginForm({
   className,
   ...props
-  
 }: React.ComponentProps<'div'>) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -24,6 +21,7 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
 
   const render_url = import.meta.env.VITE_render_url;
+  console.log(render_url);
 
   const handleLogin = async () => {
     setIsLoading(true);
