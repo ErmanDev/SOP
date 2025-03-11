@@ -10,6 +10,8 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { InputPassword } from './ui/input-password';
 import { logo } from '@/assets/image';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export function LoginForm({
   className,
