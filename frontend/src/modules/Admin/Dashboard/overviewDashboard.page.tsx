@@ -89,17 +89,17 @@ export default function OverviewDashboard() {
   const [timeRange, setTimeRange] = useState('6m');
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
 
-  // useEffect(() => {
-  //   const fetchTotalUsers = async () => {
-  //     try {
-  //       const response = await axios.get(
-  //         `${render_url}/api/users/countUsers`
-  //       );
-  //       setTotalUsers(response.data.totalUsers);
-  //     } catch (error) {
-  //       console.error('Error fetching total users:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchTotalUsers = async () => {
+      try {
+        const response = await axios.get(
+          `${render_url}/api/users/countUsers`
+        );
+        setTotalUsers(response.data.totalUsers);
+      } catch (error) {
+        console.error('Error fetching total users:', error);
+      }
+    };
 
     fetchTotalUsers();
   }, []);

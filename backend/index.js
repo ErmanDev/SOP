@@ -7,15 +7,15 @@ const uploadRoute = require('./routes/uploadRoutes.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// const allowedOrigins = 'https://agropro-agritech-hr-management.vercel.app';
+const allowedOrigins = 'https://agropro-agritech-hr-management.vercel.app';
 
 
 app.use(express.json());
-// app.use(cors({
-//   origin: allowedOrigins,
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//   credentials: true
-// }));
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/upload', uploadRoute);
