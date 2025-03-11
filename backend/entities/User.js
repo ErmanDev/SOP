@@ -52,8 +52,7 @@ const User = sequelize.define(
       allowNull: true,
     },
     team: {
-      type: DataTypes.ENUM("north", "south"), // ✅ Fixed ENUM formatting
-      allowNull: true,
+      type: DataTypes.ENUM("north", "south"),
     },
     profile_url: {
       type: DataTypes.STRING,
