@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const render_url = import.meta.env.REACT_APP_RENDER_URL;
+const render_url = import.meta.env.VITE_render_url;
 
 export function NavUser({
   user,
@@ -38,7 +38,7 @@ export function NavUser({
   const handleLogout = async () => {
     try {
       await axios.post(
-        'http://localhost:3000/api/auth/logout',
+        `${render_url}/api/auth/logout`,
         {},
         {
           headers: {

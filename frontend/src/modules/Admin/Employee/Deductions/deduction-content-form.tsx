@@ -33,14 +33,12 @@ const userSchema = z.object({
     }),
 
   middle_name: z.string().optional(),
-
 });
 
 const defaultValues = {
   description: '',
   last_name: '',
   middle_name: '',
- 
 };
 
 export type UserFormValues = z.infer<typeof userSchema>;
@@ -64,21 +62,15 @@ const DeductionContentForm = () => {
     data: UserFormValues
   ) => {
     try {
-      const {
-        description,
-        last_name,
-        middle_name,
-       
-      } = data;
+      const { description, last_name, middle_name } = data;
       const userData = {
         description,
         last_name,
         middle_name,
-       
       };
 
       console.log(userData);
-      await createDeduction(userData);
+      // await createDeduction(userData);
 
       resetForm();
       setIsOpen(false);

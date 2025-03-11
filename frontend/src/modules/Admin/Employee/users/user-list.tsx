@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -17,7 +16,6 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 import IUser from './user.interface';
 
@@ -33,7 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-
 
 // Assume these functions make API calls to your backend
 
@@ -53,7 +50,9 @@ const roleColors: RoleColor = {
     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
 };
 
-const statusVariant = {
+type Status = 'active' | 'inactive' | 'suspended';
+
+const statusVariant: Record<Status, string> = {
   active: 'success',
   inactive: 'destructive',
   suspended: 'secondary',
@@ -73,7 +72,6 @@ const RoleBadge = ({ role }: { role: string }) => {
 };
 
 const UsersList = () => {
-
   const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const { data: userDetails, isLoading, error } = useReadUsers();
@@ -166,7 +164,16 @@ const UsersList = () => {
           <RoleBadge role={user.position} />
         </TableCell>
         <TableCell className="text-center">
-          <Badge variant={statusVariant[user.status] || 'outline'}>
+          <Badge
+            variant={
+              (statusVariant[user.status as keyof typeof statusVariant] as
+                | 'success'
+                | 'destructive'
+                | 'secondary'
+                | 'default'
+                | 'outline') || 'outline'
+            }
+          >
             {user.status}
           </Badge>
         </TableCell>

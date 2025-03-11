@@ -24,8 +24,8 @@ import { Label } from '@/components/ui/label';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const UserForm = ({ form }: any) => {
-  const { setFocus, setValue, formState } = form;
-  const { errors } = formState;
+  // const { setFocus, setValue, formState } = form;
+  // const { errors } = formState;
 
   return (
     <div className="p-5">

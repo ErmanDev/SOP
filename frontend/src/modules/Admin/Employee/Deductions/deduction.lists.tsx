@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -16,19 +16,18 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MoreHorizontalIcon, Search } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-
+import { Search } from 'lucide-react';
+// import { useNavigate } from 'react-router-dom';
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuLabel,
+//   DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
 
 import { Spinner } from '@/components/spinner';
-import { Badge } from '@/components/ui/badge';
+// import { Badge } from '@/components/ui/badge';
 import { useMemo, useState } from 'react';
 
 import DeductionContentForm from './deduction-content-form';
@@ -41,40 +40,40 @@ import IUser from '../users/user.interface';
 // const safeAccess = (obj: any, path: string) => {
 //   return path.split('.').reduce((acc, part) => acc && acc[part] !== undefined ? acc[part] : undefined, obj);
 // };
-type RoleColor = {
-  [key in 'admin' | 'manager' | 'technician']: string;
-};
+// type RoleColor = {
+//   [key in 'admin' | 'manager' | 'technician']: string;
+// };
+//
+// const roleColors: RoleColor = {
+//   admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+//   manager:
+//     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+//   technician:
+//     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+// };
 
-const roleColors: RoleColor = {
-  admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  manager:
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  technician:
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-};
+// const statusVariant = {
+//   active: 'success',
+//   inactive: 'destructive',
+//   suspended: 'secondary',
+// };
 
-const statusVariant = {
-  active: 'success',
-  inactive: 'destructive',
-  suspended: 'secondary',
-};
-
-const RoleBadge = ({ role }: { role: string }) => {
-  const color =
-    role.toLowerCase() in roleColors
-      ? roleColors[role.toLowerCase() as keyof RoleColor]
-      : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
-
-  return (
-    <Badge className={`${color} capitalize`} variant="outline">
-      {role}
-    </Badge>
-  );
-};
+// const RoleBadge = ({ role }: { role: string }) => {
+//   const color =
+//     role.toLowerCase() in roleColors
+//       ? roleColors[role.toLowerCase() as keyof RoleColor]
+//       : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+//
+//   return (
+//     <Badge className={`${color} capitalize`} variant="outline">
+//       {role}
+//     </Badge>
+//   );
+// };
 
 const DeductionList = () => {
-  const navigate = useNavigate();
-  const [selectedTeam, setSelectedTeam] = useState<string>('');
+  // const navigate = useNavigate();
+  // const [selectedTeam, setSelectedTeam] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const { data: userDetails, isLoading, error } = useReadUsers();
 
@@ -153,7 +152,6 @@ const DeductionList = () => {
         <TableCell className="font-light text-center">
           <span className=" font-bold text-md">{user.allowance}</span>
         </TableCell>
-     
       </TableRow>
     ));
   };
@@ -179,26 +177,23 @@ const DeductionList = () => {
         <CardHeader>
           <div className="flex justify-between items-start ga">
             <div className="flex flex-col">
-              <CardTitle className="text-[#492309]">Employee Deductions</CardTitle>
+              <CardTitle className="text-[#492309]">
+                Employee Deductions
+              </CardTitle>
               <CardDescription>
                 Manage your Employee Deductions.
               </CardDescription>
             </div>
-            <div>
-             
-            </div>
+            <div></div>
           </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-          
                 <TableHead className="text-center">Description</TableHead>
                 <TableHead className="text-center">Amount</TableHead>
                 <TableHead className="text-center">Action</TableHead>
-               
-               
               </TableRow>
             </TableHeader>
             <TableBody>{renderTableContent()}</TableBody>

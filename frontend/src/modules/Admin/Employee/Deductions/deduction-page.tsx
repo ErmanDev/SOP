@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/sr-tabs";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import UsersList from "../users/user-list";
+// import UsersList from "../users/user-list";
 import DeductionList from "./deduction.lists";
 
 const DeductionPage = () => {

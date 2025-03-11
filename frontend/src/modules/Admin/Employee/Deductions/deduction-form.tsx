@@ -9,26 +9,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { InputPassword } from '@/components/ui/input-password';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-
-import { Label } from '@/components/ui/label';
 
 // Component initialization
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const DeductionForm = ({ form }: any) => {
-  const { setFocus, setValue, formState } = form;
-  const { errors } = formState;
-
-
+  // const {  formState } = form;
+  // const { errors } = formState;
 
   return (
     <div className="p-5">
@@ -50,10 +37,8 @@ export const DeductionForm = ({ form }: any) => {
             )}
           />
 
-
           {/* <Separator /> */}
 
-         
           <FormField
             control={form.control}
             name="allowance"
@@ -81,7 +66,7 @@ export const DeductionForm = ({ form }: any) => {
               </FormItem>
             )}
           />
- <FormField
+          <FormField
             control={form.control}
             name="Amount"
             render={({ field }) => (
@@ -94,10 +79,6 @@ export const DeductionForm = ({ form }: any) => {
               </FormItem>
             )}
           />
-
-
-        
-       
         </form>
       </Form>
     </div>

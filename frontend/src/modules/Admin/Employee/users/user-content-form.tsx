@@ -72,14 +72,15 @@ const defaultValues = {
   first_name: '',
   last_name: '',
   middle_name: '',
-  profile_url: undefined,
-  address: '',
+  profile_url: '',
   emergency_contact: '',
+  address: '',
+  salary: 0,
   password: '',
   email: '',
   position: '',
   contact: '',
-  allowance: '',
+  allowance: 0,
 };
 
 export type UserFormValues = z.infer<typeof userSchema>;

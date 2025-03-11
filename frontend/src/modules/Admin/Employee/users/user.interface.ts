@@ -1,4 +1,4 @@
-import { StringValidation } from "zod";
+
 
 export default interface IUser {
   employeeId: string;
@@ -27,7 +27,7 @@ export default interface IUser {
   middle_name?: string;
   salary: number;
   address: string;
-  contact: IEmergencyContact;
+  contact: string;
 
 
   email: string;
@@ -40,7 +40,7 @@ export default interface IUser {
   userRole?: string;
 }
 
-interface IEmergencyContact {
-  name: string;
-  contactNumber: string
-}
+// interface IEmergencyContact {
+//   name: string;
+//   contactNumber: string
+// }
