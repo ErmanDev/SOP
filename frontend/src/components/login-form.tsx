@@ -20,15 +20,15 @@ export function LoginForm({
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const render_url = import.meta.env.VITE_render_url;
+  // const render_url = import.meta.env.VITE_render_url;
 
   const handleLogin = async () => {
     setIsLoading(true);
-    try {
-      const response = await axios.post(`${render_url}/api/auth/login`, {
-        email,
-        password,
-      });
+    // try {
+    //   const response = await axios.post(`${render_url}/api/auth/login`, {
+    //     email,
+    //     password,
+    //   });
 
       if (!response.data) {
         throw new Error('Invalid server response');
