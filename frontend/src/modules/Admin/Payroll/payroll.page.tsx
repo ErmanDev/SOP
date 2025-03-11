@@ -1,11 +1,11 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/sr-tabs";
-import { useState } from "react";
-import ManagerList from "./asm.payrol";
-import TechinicianList from "./fts.payroll";
-import PayrollList from "./payroll.list";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/sr-tabs';
+import { useState } from 'react';
+// import ManagerList from "./asm.payrol";
+import TechinicianList from './fts.payroll';
+import PayrollList from './payroll.list';
 
 const PayrollPage = () => {
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState('all');
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -20,11 +20,11 @@ const PayrollPage = () => {
       <TabsContent value="all">
         <PayrollList />
       </TabsContent>
-      
-      <TabsContent value="managers">
+
+      {/* <TabsContent value="managers">
         <ManagerList />
-      </TabsContent>
-      
+      </TabsContent> */}
+
       <TabsContent value="technicians">
         <TechinicianList />
       </TabsContent>

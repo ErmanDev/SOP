@@ -9,7 +9,7 @@ import UsersList from '@/modules/Admin/Employee/users/user-list';
 import PayrollPage from '@/modules/Admin/Payroll/payroll.page';
 import PayrollList from '@/modules/Admin/Payroll/payroll.list';
 import TechinicianList from '@/modules/Admin/Payroll/fts.payroll';
-import ManagerList from '@/modules/Admin/Payroll/asm.payrol';
+// import ManagerList from '@/modules/Admin/Payroll/asm.payrol';
 import ProtectedRoute from '@/modules/Guard/protected-route';
 import AttendancePage from '@/modules/Admin/Attendance/attendance';
 import DeductionPage from '@/modules/Admin/Employee/Deductions/deduction-page';
@@ -113,11 +113,11 @@ export const router = createBrowserRouter([
                 path: 'technician-list',
                 Component: TechinicianList,
               },
-
-              {
-                path: 'manager-list',
-                Component: ManagerList,
-              },
+              //
+              //               {
+              //                 path: 'manager-list',
+              //                 Component: ManagerList,
+              //               },
             ],
           },
         ],
