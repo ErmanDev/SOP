@@ -1,116 +1,52 @@
-'use client';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { InputPassword } from './ui/input-password';
-import { logo } from '@/assets/image';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { InputPassword } from '@/components/ui/input-password';
+import { Label } from '@/components/ui/label';
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+interface LoginFormProps {
+  onSubmit: (credentials: { email: string; password: string }) => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const render_url = import.meta.env.VITE_render_url;
-  console.log(render_url);
-
-  const handleLogin = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.post(`${render_url}/api/auth/login`, {
-        email,
-        password,
-      });
-
-      if (!response.data) {
-        throw new Error('Invalid server response');
-      }
-
-      const { accessToken, uid, first_name, position, profile_url } =
-        response.data;
-
-      if (!accessToken || !uid) {
-        throw new Error(
-          response?.data?.error || 'Login failed. Please try again.'
-        );
-      }
-      if (!['hr'].includes(position)) {
-        toast.error('Unauthorized Access');
-        return;
-      }
-
-      const user = { accessToken, uid, first_name, position };
-
-      // Store user data securely
-      Cookies.set('access_token', accessToken, { expires: 1 });
-      Cookies.set('user', JSON.stringify(user), { expires: 1 });
-      Cookies.set('profile_url', profile_url, { expires: 1 });
-
-      try {
-        localStorage.setItem('uid', uid.toString());
-        localStorage.setItem('first_name', first_name);
-        localStorage.setItem('email', email);
-        localStorage.setItem('position', position);
-      } catch (storageError) {
-        console.warn('Storage error:', storageError);
-      }
-
-      toast.success('Login successful');
-      navigate('/dashboard-app');
-    } catch (error) {
-      console.error('Login error:', error);
-      const errorMessage =
-        (axios.isAxiosError(error) && error.response?.data?.error) ||
-        'An unexpected error occurred. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error('Please fill in both fields');
-      return;
-    }
-    handleLogin();
+    onSubmit({ email, password });
+  };
+
+  const handleNavigateToDashboard = () => {
+    navigate('/dashboard-app');
   };
 
   return (
-    <div className={`${className} overflow-hidden `} {...props}>
-      <Card className="overflow-hidden">
-        <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col items-center text-center">
-                <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-muted-foreground">
-                  Login to your Agropro account
-                </p>
-              </div>
+    <div className="flex items-center justify-center min-h-screen ">
+      <Card className="w-full max-w-md bg-white shadow-lg rounded-lg">
+        <div className="p-10">
+          <h2 className="text-3xl font-bold text-center mb-6 text-purple-950">
+            Log In
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="id">User ID</Label>
+              <Input
+                id="userId"
+                type="text"
+                placeholder="01234"
+                required
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+              />
+            </div>
+
+            <div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@gmail.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
                 <InputPassword
                   id="password"
                   type="password"
@@ -120,20 +56,28 @@ export function LoginForm({
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
-              </Button>
             </div>
+            <label>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center"></div>
+                <a href="#" className="text-sm text-gray-600 hover:underline">
+                  Forgot password?
+                </a>
+              </div>
+            </label>
+
+            <Button
+              onClick={handleNavigateToDashboard}
+              type="submit"
+              className="w-full bg-gray-900 hover:bg-black text-white py-2 rounded cursor-pointer hover:opacity-90"
+            >
+              LOG IN
+            </Button>
           </form>
-          <div className="relative hidden bg-muted md:block">
-            <img src={logo} alt="" />
-          </div>
-        </CardContent>
+        </div>
       </Card>
-      <div className="text-center text-xs text-muted-foreground mt-5">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
-        and <a href="#">Privacy Policy</a>.
-      </div>
     </div>
   );
-}
+};
+
+export default LoginForm;

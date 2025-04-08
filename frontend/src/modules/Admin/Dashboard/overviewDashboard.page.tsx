@@ -43,7 +43,6 @@ import { StatCardProps } from './types';
 import { PersonIcon } from '@radix-ui/react-icons';
 import axios from 'axios';
 
-
 const render_url = import.meta.env.VITE_render_url;
 
 const medicineAvailabilityData = [
@@ -92,9 +91,7 @@ export default function OverviewDashboard() {
   useEffect(() => {
     const fetchTotalUsers = async () => {
       try {
-        const response = await axios.get(
-          `${render_url}/api/users/countUsers`
-        );
+        const response = await axios.get(`${render_url}/api/users/countUsers`);
         setTotalUsers(response.data.totalUsers);
       } catch (error) {
         console.error('Error fetching total users:', error);
@@ -126,12 +123,11 @@ export default function OverviewDashboard() {
           icon={<PersonIcon className="h-4 w-4" />}
           title="Total Employees"
           value={totalUsers?.toString() ?? 'Loading...'}
-        
         />
 
         <StatCard
           icon={<Timer className="h-4 w-4" />}
-          title="On Time Today"
+          title="Sales Today"
           value="85"
           trend={3.7}
         />
@@ -152,7 +148,7 @@ export default function OverviewDashboard() {
       <div className="grid w-full gap-4 grid-cols-1">
         <Card className="col-span-2 md:col-span-3 w-full">
           <CardHeader>
-            <CardTitle>Monhtly Attendance Report</CardTitle>
+            <CardTitle>Monthly Sales Report</CardTitle>
             <CardDescription>
               Percentage of Attendance and Late troughout the year
             </CardDescription>

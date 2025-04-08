@@ -25,7 +25,7 @@ const LayoutPage = ({ children }: { children: ReactNode }) => {
   };
 
   const firstName = capitalizeWords(
-    localStorage.getItem('first_name') || 'User'
+    localStorage.getItem('first_name') || 'Yssa'
   );
 
   const identifierCrumb = (): string => {
@@ -113,7 +113,7 @@ const LayoutPage = ({ children }: { children: ReactNode }) => {
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {identifierCrumb().length < 2 ? (
-                  `Welcome , ${firstName}`
+                  `Welcome, ${firstName}`
                 ) : (
                   <>
                     <BreadcrumbSeparator />

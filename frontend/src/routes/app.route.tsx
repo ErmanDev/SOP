@@ -29,7 +29,7 @@ export const router = createBrowserRouter([
 
   {
     path: '/dashboard-app',
-    element: <ProtectedRoute />,
+    // element: <ProtectedRoute />,
     children: [
       {
         path: '',

@@ -1,11 +1,15 @@
 import * as React from 'react';
 import {
-  BookOpen,
-  Calendar,
+  ClipboardMinus,
+  Monitor,
   GalleryVerticalEnd,
   LayoutDashboardIcon,
-  PersonStanding,
+  ShoppingBasket,
   Settings2,
+  Percent,
+  HandCoins,
+  User2,
+  Users,
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
@@ -41,7 +45,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     );
     const email = localStorage.getItem('email') || 'example@gmail.com';
     const avatar = Cookies.get('profile_url') || '../assets/logos.png';
-  
+
     setUser({ name: firstName, email, avatar });
   }, []);
 
@@ -49,7 +53,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     user,
     teams: [
       {
-        name: 'AGROPRO',
+        name: 'ABENSON',
         logo: GalleryVerticalEnd,
         plan: 'Enterprise',
       },
@@ -61,9 +65,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: LayoutDashboardIcon,
       },
       {
-        title: 'Employees',
+        title: 'POS',
         url: 'users',
-        icon: PersonStanding,
+        icon: Monitor,
         items: [
           {
             title: 'Users',
@@ -76,14 +80,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
       {
-        title: 'Attendance',
+        title: 'Sales',
         url: 'Attendance',
-        icon: Calendar,
+        icon: Percent,
       },
       {
-        title: 'Payroll',
+        title: 'Purchase',
         url: '#',
-        icon: BookOpen,
+        icon: ShoppingBasket,
         items: [
           {
             title: 'Employee Payroll',
@@ -96,9 +100,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ],
       },
       {
-        title: 'Settings',
+        title: 'Customers',
+        url: '#',
+        icon: Users,
+      },
+      {
+        title: 'Employees',
         url: '#',
         icon: Settings2,
+      },
+      {
+        title: 'Payroll',
+        url: '#',
+        icon: HandCoins,
+      },
+      {
+        title: 'Reports',
+        url: '#',
+        icon: ClipboardMinus,
       },
     ],
   };
