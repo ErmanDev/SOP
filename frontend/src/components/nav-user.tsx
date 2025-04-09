@@ -36,31 +36,7 @@ export function NavUser({
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try {
-      await axios.post(
-        `${render_url}/api/auth/logout`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get('access_token')}`,
-          },
-        }
-      );
-    } catch (error) {
-      console.error('Logout failed', error);
-    }
-
-    localStorage.removeItem('uid');
-    localStorage.removeItem('first_name');
-
-    localStorage.removeItem('email');
-    localStorage.removeItem('posiion');
-
-    Cookies.remove('access_token');
-    Cookies.remove('profile_url');
-    Cookies.remove('user');
-
-    navigate('/');
+    navigate('/login');
   };
 
   return (

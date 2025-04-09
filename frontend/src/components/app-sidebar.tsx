@@ -61,23 +61,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     navMain: [
       {
         title: 'Dashboard',
-        url: '/dashboard-app',
+        url: '/dashboard',
         icon: LayoutDashboardIcon,
       },
       {
         title: 'POS',
         url: 'users',
         icon: Monitor,
-        items: [
-          {
-            title: 'Users',
-            url: 'users',
-          },
-          {
-            title: 'Deductions',
-            url: 'deductions',
-          },
-        ],
       },
       {
         title: 'Sales',
@@ -88,16 +78,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Purchase',
         url: '#',
         icon: ShoppingBasket,
-        items: [
-          {
-            title: 'Employee Payroll',
-            url: 'payroll',
-          },
-          {
-            title: 'Employee Funds',
-            url: 'funds',
-          },
-        ],
       },
       {
         title: 'Customers',

@@ -1,6 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import PageLayout from '@/layouts/page.layout';
-import LoginPage from '@/modules/Auth/login.page';
+import LoginPage from '@/modules/Auth/login/login.page';
 import AdminLayout from '@/layouts/admin.layout';
 import DashboardPage from '@/modules/Admin/Dashboard/dashboard.page';
 import OverviewDashboard from '@/modules/Admin/Dashboard/overviewDashboard.page';
@@ -14,10 +14,16 @@ import ProtectedRoute from '@/modules/Guard/protected-route';
 import AttendancePage from '@/modules/Admin/Attendance/attendance';
 import DeductionPage from '@/modules/Admin/Employee/Deductions/deduction-page';
 import DeductionList from '@/modules/Admin/Employee/Deductions/deduction.lists';
+import ResetPage from '@/modules/Auth/reset-password/rest.page';
+import ForgotPasswordPage from '@/modules/Auth/forgot-password/forgot-password-page';
 
 export const router = createBrowserRouter([
   {
-    path: '',
+    path: '/',
+    element: <Navigate to="/login" replace />,
+  },
+  {
+    path: '/login',
     Component: PageLayout,
     children: [
       {
@@ -26,9 +32,30 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: '/reset-password',
+    Component: PageLayout,
+    children: [
+      {
+        index: true,
+        Component: ResetPage,
+      },
+    ],
+  },
 
   {
-    path: '/dashboard-app',
+    path: 'forgot-password',
+    Component: PageLayout,
+    children: [
+      {
+        index: true,
+        Component: ForgotPasswordPage,
+      },
+    ],
+  },
+
+  {
+    path: '/dashboard',
     // element: <ProtectedRoute />,
     children: [
       {
@@ -37,22 +64,9 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            Component: DashboardPage,
+            Component: OverviewDashboard,
           },
-          {
-            path: '',
-            Component: DashboardPage,
-            children: [
-              {
-                index: true,
-                Component: OverviewDashboard,
-              },
-              {
-                path: 'overview',
-                Component: OverviewDashboard,
-              },
-            ],
-          },
+
           {
             path: 'users',
             Component: UserPage,

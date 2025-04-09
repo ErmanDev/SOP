@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import LoginForm from '@/components/login-form';
+import LoginForm from '@/modules/Auth/login/login-form';
 
 function LoginPage() {
   return (
