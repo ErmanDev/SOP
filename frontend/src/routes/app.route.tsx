@@ -1,15 +1,11 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import PageLayout from '@/layouts/page.layout';
 import LoginPage from '@/modules/Auth/login/login.page';
-import AdminLayout from '@/layouts/admin.layout';
 import Dashboard from '@/modules/Admin/Dashboard/dashboard';
-import UserPage from '@/modules/Admin/Employee/users/users.page';
-import UsersList from '@/modules/Admin/Employee/users/user-list';
 import ProtectedRoute from '@/modules/Guard/protected-route';
-import DeductionPage from '@/modules/Admin/Employee/Deductions/deduction-page';
-import DeductionList from '@/modules/Admin/Employee/Deductions/deduction.lists';
 import ResetPage from '@/modules/Auth/reset-password/rest.page';
 import ForgotPasswordPage from '@/modules/Auth/forgot-password/forgot-password-page';
+import UserLayout from '@/layouts/user.layout';
 
 export const router = createBrowserRouter([
   {
@@ -49,7 +45,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    element: <AdminLayout />,
+    element: <UserLayout />,
     children: [
       {
         path: '/dashboard',
