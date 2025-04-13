@@ -6,7 +6,6 @@ import Dashboard from '@/modules/Admin/Dashboard/dashboard';
 import UserPage from '@/modules/Admin/Employee/users/users.page';
 import UsersList from '@/modules/Admin/Employee/users/user-list';
 import ProtectedRoute from '@/modules/Guard/protected-route';
-import AttendancePage from '@/modules/Admin/Attendance/attendance';
 import DeductionPage from '@/modules/Admin/Employee/Deductions/deduction-page';
 import DeductionList from '@/modules/Admin/Employee/Deductions/deduction.lists';
 import ResetPage from '@/modules/Auth/reset-password/rest.page';
@@ -57,46 +56,32 @@ export const router = createBrowserRouter([
         Component: Dashboard,
       },
       {
-        path: '/users',
-        Component: UserPage,
-        children: [
-          {
-            index: true,
-            Component: UsersList,
-          },
-          {
-            path: 'users-list',
-            Component: UsersList,
-          },
-        ],
+        path: '/pos',
+        Component: '',
       },
       {
-        path: '/attendance',
-        Component: AttendancePage,
-        children: [
-          {
-            index: true,
-            Component: UsersList,
-          },
-          {
-            path: 'users-list',
-            Component: UsersList,
-          },
-        ],
+        path: '/sales',
+        Component: '',
       },
       {
-        path: '/deductions',
-        Component: DeductionPage,
-        children: [
-          {
-            index: true,
-            Component: DeductionList,
-          },
-          {
-            path: 'deduction-list',
-            Component: DeductionList,
-          },
-        ],
+        path: '/purchase',
+        Component: '',
+      },
+      {
+        path: '/customers',
+        Component: '',
+      },
+      {
+        path: '/employees',
+        Component: '',
+      },
+      {
+        path: '/payroll',
+        Component: '',
+      },
+      {
+        path: '/reports',
+        Component: '',
       },
     ],
   },
