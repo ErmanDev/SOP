@@ -1,4 +1,4 @@
 import logo from './logo.png';
-import bg
+import bg from './background.jpg';
 
-export { logo };
+export { logo, bg };

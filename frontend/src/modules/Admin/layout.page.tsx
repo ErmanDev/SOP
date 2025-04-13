@@ -87,7 +87,7 @@ const LayoutPage = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Layout>
+    <Layout className="bg-waves">
       <LayoutHeader>
         <SidebarTrigger className="-ml-1" />
         <UserHeader

@@ -63,41 +63,49 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Dashboard',
         url: '/dashboard',
         icon: LayoutDashboardIcon,
+        roles: ['admin', 'employee'], // accessible by both
       },
       {
         title: 'POS',
-        url: 'users',
+        url: '/dashboard/users',
         icon: Monitor,
+        roles: ['admin'], // only admin
       },
       {
         title: 'Sales',
-        url: 'Attendance',
+        url: '/dashboard/attendance',
         icon: Percent,
+        roles: ['admin', 'employee'],
       },
       {
         title: 'Purchase',
         url: '#',
         icon: ShoppingBasket,
+        roles: ['admin'],
       },
       {
         title: 'Customers',
         url: '#',
         icon: Users,
+        roles: ['admin'],
       },
       {
         title: 'Employees',
         url: '#',
         icon: Settings2,
+        roles: ['admin'],
       },
       {
         title: 'Payroll',
         url: '#',
         icon: HandCoins,
+        roles: ['admin'],
       },
       {
         title: 'Reports',
         url: '#',
         icon: ClipboardMinus,
+        roles: ['admin'],
       },
     ],
   };
