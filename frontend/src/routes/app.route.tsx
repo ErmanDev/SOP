@@ -6,6 +6,7 @@ import ProtectedRoute from '@/modules/Guard/protected-route';
 import ResetPage from '@/modules/Auth/reset-password/rest.page';
 import ForgotPasswordPage from '@/modules/Auth/forgot-password/forgot-password-page';
 import UserLayout from '@/layouts/user.layout';
+import Customers from '@/modules/Admin/Customers/customers';
 
 export const router = createBrowserRouter([
   {
@@ -65,7 +66,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '/customers',
-        Component: '',
+        Component: Customers,
       },
       {
         path: '/employees',

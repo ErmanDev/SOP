@@ -21,6 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit }) => {
   };
 
   const handleNavigateToDashboard = () => {
+    localStorage.setItem('user_role', 'employee');
     navigate('/dashboard');
   };
 

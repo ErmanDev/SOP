@@ -23,6 +23,7 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import Cookies from 'js-cookie';
+import { get } from 'http';
 
 const capitalizeWords = (str: string) => {
   return str
@@ -34,9 +35,10 @@ const capitalizeWords = (str: string) => {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState({
-    name: 'User',
-    email: 'example@gmail.com',
-    avatar: '../assets/logos.png',
+    name: '',
+    email: '',
+    avatar: '',
+    role: '',
   });
 
   React.useEffect(() => {
@@ -45,9 +47,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     );
     const email = localStorage.getItem('email') || 'example@gmail.com';
     const avatar = Cookies.get('profile_url') || '../assets/logos.png';
+    const role = localStorage.getItem('user_role') || 'employee';
 
-    setUser({ name: firstName, email, avatar });
+    setUser({ name: firstName, email, avatar, role });
   }, []);
+
+  const getBasePath = (role) => {
+    return role === 'admin' ? '/admin' : '/employee';
+  };
+
+  const basePath = getBasePath(user.role);
 
   const data = {
     user,
@@ -58,65 +67,68 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         plan: 'Enterprise',
       },
     ],
+    // Apply the dynamic basePath to all navigation items
     navMain: [
       {
         title: 'Dashboard',
-        url: '/dashboard',
+        url: `${basePath}/dashboard`,
         icon: LayoutDashboardIcon,
-        roles: ['admin', 'employee'], // accessible by both
+        roles: ['admin', 'employee'],
       },
       {
         title: 'POS',
-        url: '/dashboard/users',
+        url: `${basePath}/users`,
         icon: Monitor,
-        roles: ['admin'], // only admin
+        roles: ['admin', 'employee'],
       },
       {
         title: 'Sales',
-        url: '/dashboard/attendance',
+        url: `${basePath}/attendance`,
         icon: Percent,
         roles: ['admin', 'employee'],
       },
       {
         title: 'Purchase',
-        url: '#',
+        url: `${basePath}/purchase`,
         icon: ShoppingBasket,
-        roles: ['admin'],
+        roles: ['admin', 'employee'],
       },
       {
         title: 'Customers',
-        url: '#',
+        url: `${basePath}/customers`,
         icon: Users,
-        roles: ['admin'],
+        roles: ['admin', 'employee'],
       },
       {
         title: 'Employees',
-        url: '#',
+        url: `${basePath}/employees`,
         icon: Settings2,
         roles: ['admin'],
       },
       {
         title: 'Payroll',
-        url: '#',
+        url: `${basePath}/payroll`,
         icon: HandCoins,
         roles: ['admin'],
       },
       {
         title: 'Reports',
-        url: '#',
+        url: `${basePath}/reports`,
         icon: ClipboardMinus,
         roles: ['admin'],
       },
     ],
   };
-
+  const filteredNavItems = data.navMain.filter((item) =>
+    item.roles.includes(user.role)
+  );
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={filteredNavItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

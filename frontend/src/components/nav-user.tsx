@@ -17,10 +17,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-
-const render_url = import.meta.env.VITE_render_url;
 
 export function NavUser({
   user,
