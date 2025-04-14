@@ -52,12 +52,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     setUser({ name: firstName, email, avatar, role });
   }, []);
 
-  const getBasePath = (role) => {
-    return role === 'admin' ? '/admin' : '/employee';
-  };
-
-  const basePath = getBasePath(user.role);
-
   const data = {
     user,
     teams: [
@@ -67,53 +61,53 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         plan: 'Enterprise',
       },
     ],
-    // Apply the dynamic basePath to all navigation items
+
     navMain: [
       {
         title: 'Dashboard',
-        url: `${basePath}/dashboard`,
+        url: '/dashboard',
         icon: LayoutDashboardIcon,
         roles: ['admin', 'employee'],
       },
       {
         title: 'POS',
-        url: `${basePath}/users`,
+        url: '/pos',
         icon: Monitor,
         roles: ['admin', 'employee'],
       },
       {
         title: 'Sales',
-        url: `${basePath}/attendance`,
+        url: '/sales',
         icon: Percent,
         roles: ['admin', 'employee'],
       },
       {
         title: 'Purchase',
-        url: `${basePath}/purchase`,
+        url: '/purchase',
         icon: ShoppingBasket,
         roles: ['admin', 'employee'],
       },
       {
         title: 'Customers',
-        url: `${basePath}/customers`,
+        url: '/customers',
         icon: Users,
         roles: ['admin', 'employee'],
       },
       {
         title: 'Employees',
-        url: `${basePath}/employees`,
+        url: '/employees',
         icon: Settings2,
         roles: ['admin'],
       },
       {
         title: 'Payroll',
-        url: `${basePath}/payroll`,
+        url: '/payroll',
         icon: HandCoins,
         roles: ['admin'],
       },
       {
         title: 'Reports',
-        url: `${basePath}/reports`,
+        url: '/reports',
         icon: ClipboardMinus,
         roles: ['admin'],
       },

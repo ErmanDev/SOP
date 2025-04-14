@@ -7,6 +7,12 @@ import ResetPage from '@/modules/Auth/reset-password/rest.page';
 import ForgotPasswordPage from '@/modules/Auth/forgot-password/forgot-password-page';
 import UserLayout from '@/layouts/user.layout';
 import Customers from '@/modules/Admin/Customers/customers';
+import Employees from '@/modules/Admin/Employees/employees';
+import Purchase from '@/modules/Admin/Purchase/purchase';
+import Sales from '@/modules/Admin/Sales/sales';
+import Pos from '@/modules/Admin/Pos/pos';
+import Payroll from '@/modules/Admin/Payroll/payroll';
+import Reports from '@/modules/Admin/Reports/reports';
 
 export const router = createBrowserRouter([
   {
@@ -54,15 +60,15 @@ export const router = createBrowserRouter([
       },
       {
         path: '/pos',
-        Component: '',
+        Component: Pos,
       },
       {
         path: '/sales',
-        Component: '',
+        Component: Sales,
       },
       {
         path: '/purchase',
-        Component: '',
+        Component: Purchase,
       },
       {
         path: '/customers',
@@ -70,15 +76,15 @@ export const router = createBrowserRouter([
       },
       {
         path: '/employees',
-        Component: '',
+        Component: Employees,
       },
       {
         path: '/payroll',
-        Component: '',
+        Component: Payroll,
       },
       {
         path: '/reports',
-        Component: '',
+        Component: Reports,
       },
     ],
   },

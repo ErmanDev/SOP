@@ -9,31 +9,31 @@ import {
 import { EyeIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Customer() {
-  const customers = [
+export default function Employees() {
+  const employees = [
     {
-      id: 1,
+      id: '000010',
       name: 'John Doe',
-      receiptNumber: 'R12345',
-      totalAmount: '$500',
-      membership: 'Gold',
-      dateOfPurchase: '2025-04-01',
+      phone: '123-456-7890',
+      email: 'john.doe@example.com',
+      dateHired: '2023-01-15',
+      status: 'Full-time',
     },
     {
-      id: 2,
+      id: '000011',
       name: 'Jane Smith',
-      receiptNumber: 'R67890',
-      totalAmount: '$300',
-      membership: 'Silver',
-      dateOfPurchase: '2025-04-05',
+      phone: '987-654-3210',
+      email: 'jane.smith@example.com',
+      dateHired: '2022-11-20',
+      status: 'Part-time',
     },
     {
-      id: 3,
+      id: '000012',
       name: 'Alice Johnson',
-      receiptNumber: 'R11223',
-      totalAmount: '$700',
-      membership: 'Platinum',
-      dateOfPurchase: '2025-04-10',
+      phone: '555-123-4567',
+      email: 'alice.johnson@example.com',
+      dateHired: '2021-05-10',
+      status: 'Full-time',
     },
   ];
 
@@ -41,32 +41,30 @@ export default function Customer() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Filter customers based on the search term
-  const filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredEmployees = employees.filter((employee) =>
+    employee.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-  const paginatedCustomers = filteredCustomers.slice(
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+  const paginatedEmployees = filteredEmployees.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1); // Reset to the first page when searching
+    setCurrentPage(1);
   };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleView = (customer) => {
-    setSelectedCustomer(customer);
+  const handleView = (employee) => {
+    setSelectedEmployee(employee);
     setIsEditing(false);
   };
 
@@ -75,13 +73,13 @@ export default function Customer() {
   };
 
   const handleClose = () => {
-    setSelectedCustomer(null);
+    setSelectedEmployee(null);
     setIsEditing(false);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setSelectedCustomer((prev) => ({
+    setSelectedEmployee((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -91,10 +89,10 @@ export default function Customer() {
     <div className="container mx-auto p-4">
       <div className="border rounded-lg shadow-md p-6 bg-white">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Customer Management</h1>
+          <h1 className="text-2xl font-bold">Employee Management</h1>
           <input
             type="text"
-            placeholder="Search customers..."
+            placeholder="Search employees..."
             value={searchTerm}
             onChange={handleSearch}
             className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
@@ -106,47 +104,41 @@ export default function Customer() {
             <TableHeader className="bg-purple-600">
               <TableRow>
                 <TableHead className="text-center text-white">
-                  Customer ID
+                  Employee ID
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Customer Name
+                  Employee Name
                 </TableHead>
+                <TableHead className="text-center text-white">Phone</TableHead>
+                <TableHead className="text-center text-white">Email</TableHead>
                 <TableHead className="text-center text-white">
-                  Receipt Number
+                  Date Hired
                 </TableHead>
-                <TableHead className="text-center text-white">
-                  Total Amount
-                </TableHead>
-                <TableHead className="text-center text-white">
-                  Membership
-                </TableHead>
-                <TableHead className="text-center text-white">
-                  Date of Purchase
-                </TableHead>
+                <TableHead className="text-center text-white">Status</TableHead>
                 <TableHead className="text-center text-white">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedCustomers.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell className="text-center">{customer.id}</TableCell>
-                  <TableCell className="text-center">{customer.name}</TableCell>
+              {paginatedEmployees.map((employee) => (
+                <TableRow key={employee.id}>
+                  <TableCell className="text-center">{employee.id}</TableCell>
+                  <TableCell className="text-center">{employee.name}</TableCell>
                   <TableCell className="text-center">
-                    {customer.receiptNumber}
+                    {employee.phone}
                   </TableCell>
                   <TableCell className="text-center">
-                    {customer.totalAmount}
+                    {employee.email}
                   </TableCell>
                   <TableCell className="text-center">
-                    {customer.membership}
+                    {employee.dateHired}
                   </TableCell>
                   <TableCell className="text-center">
-                    {customer.dateOfPurchase}
+                    {employee.status}
                   </TableCell>
                   <TableCell className="text-center">
                     <button
                       className="text-blue-500 hover:underline"
-                      onClick={() => handleView(customer)}
+                      onClick={() => handleView(employee)}
                     >
                       <EyeIcon className="h-5 w-5" />
                     </button>
@@ -174,19 +166,19 @@ export default function Customer() {
         </div>
       </div>
 
-      {selectedCustomer && (
+      {selectedEmployee && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
             <h2 className="text-xl font-bold mb-4">
-              {isEditing ? 'Edit Customer Details' : 'View Customer Details'}
+              {isEditing ? 'Edit Employee Details' : 'View Employee Details'}
             </h2>
             <form>
               <div className="mb-4">
-                <label className="block text-sm font-medium">Customer ID</label>
+                <label className="block text-sm font-medium">Employee ID</label>
                 <input
                   type="text"
                   name="id"
-                  value={selectedCustomer.id}
+                  value={selectedEmployee.id}
                   readOnly
                   className="w-full border rounded px-3 py-2 bg-gray-100"
                 />
@@ -196,7 +188,7 @@ export default function Customer() {
                 <input
                   type="text"
                   name="name"
-                  value={selectedCustomer.name}
+                  value={selectedEmployee.name}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${
@@ -205,13 +197,11 @@ export default function Customer() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">
-                  Receipt Number
-                </label>
+                <label className="block text-sm font-medium">Phone</label>
                 <input
                   type="text"
-                  name="receiptNumber"
-                  value={selectedCustomer.receiptNumber}
+                  name="phone"
+                  value={selectedEmployee.phone}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${
@@ -220,13 +210,11 @@ export default function Customer() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">
-                  Total Amount
-                </label>
+                <label className="block text-sm font-medium">Email</label>
                 <input
-                  type="text"
-                  name="totalAmount"
-                  value={selectedCustomer.totalAmount}
+                  type="email"
+                  name="email"
+                  value={selectedEmployee.email}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${
@@ -235,11 +223,11 @@ export default function Customer() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">Membership</label>
+                <label className="block text-sm font-medium">Date Hired</label>
                 <input
                   type="text"
-                  name="membership"
-                  value={selectedCustomer.membership}
+                  name="dateHired"
+                  value={selectedEmployee.dateHired}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${
@@ -248,13 +236,11 @@ export default function Customer() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">
-                  Date of Purchase
-                </label>
+                <label className="block text-sm font-medium">Status</label>
                 <input
                   type="text"
-                  name="dateOfPurchase"
-                  value={selectedCustomer.dateOfPurchase}
+                  name="status"
+                  value={selectedEmployee.status}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${

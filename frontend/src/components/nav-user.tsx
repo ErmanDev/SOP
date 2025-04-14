@@ -32,6 +32,7 @@ export function NavUser({
   const navigate = useNavigate();
 
   const handleLogout = async () => {
+    localStorage.removeItem('user_role');
     navigate('/login');
   };
 

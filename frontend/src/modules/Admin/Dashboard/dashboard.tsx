@@ -19,25 +19,25 @@ export default function Dashboard() {
         <StatCard
           icon={<DollarSign className="h-4 w-4" />}
           title="Sales Today"
-          value="85"
+          value="0"
           trend={3.7}
         />
         <StatCard
           icon={<User2 className="h-4 w-4" />}
           title="Total Customers"
-          value="68"
+          value="0"
           trend={-2.5}
         />
         <StatCard
           icon={<DollarSign className="h-4 w-4" />}
           title="Monthly Payroll"
-          value="78%"
+          value="0"
           trend={0}
         />
         <StatCard
           icon={<DollarSign className="h-4 w-4" />}
           title="Monthly Payroll"
-          value="78%"
+          value="0"
           trend={0}
         />
       </div>
