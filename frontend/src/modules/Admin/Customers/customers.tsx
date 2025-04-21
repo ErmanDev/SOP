@@ -14,7 +14,8 @@ export default function Customer() {
     {
       id: 1,
       name: 'John Doe',
-      receiptNumber: 'R12345',
+      email: 'yahoo@gmail.com',
+      phone: '123-456-7890',
       totalAmount: '$500',
       membership: 'Gold',
       dateOfPurchase: '2025-04-01',
@@ -22,7 +23,8 @@ export default function Customer() {
     {
       id: 2,
       name: 'Jane Smith',
-      receiptNumber: 'R67890',
+      email: 'yahoo@gmail.com',
+      phone: '123-456-7890',
       totalAmount: '$300',
       membership: 'Silver',
       dateOfPurchase: '2025-04-05',
@@ -30,7 +32,8 @@ export default function Customer() {
     {
       id: 3,
       name: 'Alice Johnson',
-      receiptNumber: 'R11223',
+      email: 'yahoo@gmail.com',
+      phone: '123-456-7890',
       totalAmount: '$700',
       membership: 'Platinum',
       dateOfPurchase: '2025-04-10',
@@ -111,9 +114,8 @@ export default function Customer() {
                 <TableHead className="text-center text-white">
                   Customer Name
                 </TableHead>
-                <TableHead className="text-center text-white">
-                  Receipt Number
-                </TableHead>
+                <TableHead className="text-center text-white">Email</TableHead>
+                <TableHead className="text-center text-white">Phone</TableHead>
                 <TableHead className="text-center text-white">
                   Total Amount
                 </TableHead>
@@ -132,7 +134,10 @@ export default function Customer() {
                   <TableCell className="text-center">{customer.id}</TableCell>
                   <TableCell className="text-center">{customer.name}</TableCell>
                   <TableCell className="text-center">
-                    {customer.receiptNumber}
+                    {customer.email}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {customer.phone}
                   </TableCell>
                   <TableCell className="text-center">
                     {customer.totalAmount}
@@ -205,13 +210,24 @@ export default function Customer() {
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium">
-                  Receipt Number
-                </label>
+                <label className="block text-sm font-medium">Email</label>
                 <input
                   type="text"
-                  name="receiptNumber"
-                  value={selectedCustomer.receiptNumber}
+                  name="email"
+                  value={selectedCustomer.email}
+                  onChange={handleInputChange}
+                  readOnly={!isEditing}
+                  className={`w-full border rounded px-3 py-2 ${
+                    isEditing ? '' : 'bg-gray-100'
+                  }`}
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={selectedCustomer.phone}
                   onChange={handleInputChange}
                   readOnly={!isEditing}
                   className={`w-full border rounded px-3 py-2 ${
