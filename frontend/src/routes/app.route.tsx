@@ -52,39 +52,44 @@ export const router = createBrowserRouter([
   },
 
   {
-    element: <UserLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        path: '/dashboard',
-        Component: Dashboard,
-      },
-      {
-        path: '/pos',
-        Component: Pos,
-      },
-      {
-        path: '/sales',
-        Component: Sales,
-      },
-      {
-        path: '/purchase',
-        Component: Purchase,
-      },
-      {
-        path: '/customers',
-        Component: Customers,
-      },
-      {
-        path: '/employees',
-        Component: Employees,
-      },
-      {
-        path: '/payroll',
-        Component: Payroll,
-      },
-      {
-        path: '/reports',
-        Component: Reports,
+        element: <UserLayout />,
+        children: [
+          {
+            path: '/dashboard',
+            Component: Dashboard,
+          },
+          {
+            path: '/pos',
+            Component: Pos,
+          },
+          {
+            path: '/sales',
+            Component: Sales,
+          },
+          {
+            path: '/purchase',
+            Component: Purchase,
+          },
+          {
+            path: '/customers',
+            Component: Customers,
+          },
+          {
+            path: '/employees',
+            Component: Employees,
+          },
+          {
+            path: '/payroll',
+            Component: Payroll,
+          },
+          {
+            path: '/reports',
+            Component: Reports,
+          },
+        ],
       },
     ],
   },

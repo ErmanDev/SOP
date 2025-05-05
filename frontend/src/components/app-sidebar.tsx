@@ -8,7 +8,6 @@ import {
   Settings2,
   Percent,
   HandCoins,
-  User2,
   Users,
 } from 'lucide-react';
 
@@ -23,7 +22,6 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import Cookies from 'js-cookie';
-import { get } from 'http';
 
 const capitalizeWords = (str: string) => {
   return str
@@ -42,12 +40,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   });
 
   React.useEffect(() => {
-    const firstName = capitalizeWords(
-      localStorage.getItem('first_name') || 'User'
-    );
-    const email = localStorage.getItem('email') || 'example@gmail.com';
-    const avatar = Cookies.get('profile_url') || '../assets/logos.png';
-    const role = localStorage.getItem('user_role') || 'employee';
+    const firstName = capitalizeWords(Cookies.get('firstName') ?? 'User');
+    const email = Cookies.get('email') ?? 'example@gmail.com';
+    const avatar = Cookies.get('profile_url') ?? '../assets/logos.png';
+    const role = Cookies.get('role_name') ?? 'employee';
 
     setUser({ name: firstName, email, avatar, role });
   }, []);
