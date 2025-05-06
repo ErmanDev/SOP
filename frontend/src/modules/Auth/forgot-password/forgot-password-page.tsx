@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import LoginForm from '@/modules/Auth/login/login-form';
 import ForgotPasswordForm from './forgot-password-form';
 
 function ForgotPasswordPage() {
@@ -8,11 +7,7 @@ function ForgotPasswordPage() {
       <div className="  ">
         <div className="text-center space-y-8"></div>
       </div>
-      <ForgotPasswordForm
-        onSubmit={(credentials) => {
-          console.log('Submitted credentials:', credentials);
-        }}
-      />
+      <ForgotPasswordForm />
       <Outlet />
     </div>
   );

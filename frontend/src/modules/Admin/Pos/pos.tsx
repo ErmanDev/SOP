@@ -1,105 +1,95 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface Product {
+  product_id: string;
+  name: string;
+  price: number;
+  category: string;
+  image_url: string;
+  stock_quantity: number;
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  count: number;
+}
 
 export default function Pos() {
-  const categories = [
-    { id: 'all', name: 'All', count: 23145 },
-    { id: 'home-appliance', name: 'Home Appliance', count: 224 },
-    { id: 'gadgets', name: 'Gadgets', count: 509 },
-    { id: 'furnitures', name: 'Furnitures', count: 425 },
-    { id: 'smart-home', name: 'Smart Home', count: 628 },
-  ];
-
-  const products = [
-    {
-      name: 'Smartphone',
-      price: '₱15,000.00',
-      image: 'https://source.unsplash.com/200x200/?smartphone',
-    },
-    {
-      name: 'Laptop',
-      price: '₱45,000.00',
-      image: 'https://source.unsplash.com/200x200/?laptop',
-    },
-    {
-      name: 'Headphones',
-      price: '₱3,500.00',
-      image: 'https://source.unsplash.com/200x200/?headphones',
-    },
-    {
-      name: 'Smartwatch',
-      price: '₱8,000.00',
-      image: 'https://source.unsplash.com/200x200/?smartwatch',
-    },
-    {
-      name: 'Refrigerator',
-      price: '₱25,000.00',
-      image: 'https://source.unsplash.com/200x200/?refrigerator',
-    },
-    {
-      name: 'Microwave',
-      price: '₱7,000.00',
-      image: 'https://source.unsplash.com/200x200/?microwave',
-    },
-    {
-      name: 'Sofa',
-      price: '₱20,000.00',
-      image: 'https://source.unsplash.com/200x200/?sofa',
-    },
-    {
-      name: 'Dining Table',
-      price: '₱18,000.00',
-      image: 'https://source.unsplash.com/200x200/?dining-table',
-    },
-    {
-      name: 'Television',
-      price: '₱30,000.00',
-      image: 'https://source.unsplash.com/200x200/?television',
-    },
-    {
-      name: 'Air Conditioner',
-      price: '₱35,000.00',
-      image: 'https://source.unsplash.com/200x200/?air-conditioner',
-    },
-    {
-      name: 'Washing Machine',
-      price: '₱22,000.00',
-      image: 'https://source.unsplash.com/200x200/?washing-machine',
-    },
-    {
-      name: 'Vacuum Cleaner',
-      price: '₱5,000.00',
-      image: 'https://source.unsplash.com/200x200/?vacuum-cleaner',
-    },
-  ];
-
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [activeDiscount, setActiveDiscount] = useState<string | null>(null);
+  const [orderNumber, setOrderNumber] = useState(1);
 
-  const handleAddToCart = (product) => {
+  const categories: Category[] = [
+    { id: 'all', name: 'All', count: 0 },
+    { id: 'Home Appliance', name: 'Home Appliance', count: 0 },
+    { id: 'Gadgets', name: 'Gadgets', count: 0 },
+    { id: 'Furnitures', name: 'Furnitures', count: 0 },
+    { id: 'Smart Home', name: 'Smart Home', count: 0 },
+  ];
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('http://localhost:5000/api/products');
+        setProducts(response.data);
+
+        // Update category counts
+        categories.forEach((category) => {
+          if (category.id === 'all') {
+            category.count = response.data.length;
+          } else {
+            category.count = response.data.filter(
+              (product: Product) => product.category === category.id
+            ).length;
+          }
+        });
+      } catch (err) {
+        setError('Failed to fetch products');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleAddToCart = (product: Product) => {
     setCart((prevCart) => {
-      const updatedCart = prevCart.map((item) =>
-        item.name === product.name
-          ? { ...item, quantity: item.quantity + 1 }
-          : item
+      const existingItem = prevCart.find(
+        (item) => item.product_id === product.product_id
       );
 
-      const isProductInCart = prevCart.some(
-        (item) => item.name === product.name
-      );
-
-      if (!isProductInCart) {
-        return [...prevCart, { ...product, quantity: 1 }];
+      if (existingItem) {
+        return prevCart.map((item) =>
+          item.product_id === product.product_id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
       }
 
-      return updatedCart;
+      return [...prevCart, { ...product, quantity: 1 }];
     });
   };
 
-  const handleRemoveFromCart = (index) => {
+  const handleRemoveFromCart = (index: number) => {
     setCart((prevCart) => prevCart.filter((_, i) => i !== index));
   };
 
-  const handleQuantityChange = (index, newQuantity) => {
+  const handleQuantityChange = (index: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
     setCart((prevCart) => {
       const updatedCart = [...prevCart];
       updatedCart[index].quantity = newQuantity;
@@ -107,20 +97,59 @@ export default function Pos() {
     });
   };
 
-  const calculateTotal = () => {
+  const calculateSubtotal = () => {
     return cart
-      .reduce(
-        (total, item) =>
-          total +
-          parseFloat(item.price.replace('₱', '').replace(',', '')) *
-            item.quantity,
-        0
-      )
+      .reduce((total, item) => total + item.price * item.quantity, 0)
       .toFixed(2);
   };
 
+  const calculateDiscount = () => {
+    if (!activeDiscount) return '0';
+    const subtotal = parseFloat(calculateSubtotal());
+    return (subtotal * 0.1).toFixed(2);
+  };
+
+  const calculateTotal = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    const discount = parseFloat(calculateDiscount());
+    const tax = (subtotal - discount) * 0.12;
+    return (subtotal - discount + tax).toFixed(2);
+  };
+
+  const filteredProducts =
+    selectedCategory === 'all'
+      ? products
+      : products.filter((product) => product.category === selectedCategory);
+
+  const handlePayment = () => {
+    // Process payment logic here
+    setCart([]); // Clear cart after payment
+    setActiveDiscount(null); // Clear discount
+    setOrderNumber((prev) => prev + 1); // Increment order number
+  };
+
+  if (loading) {
+    return (
+      <div className="p-4 bg-gradient-to-br from-purple-600 to-blue-500 min-h-screen text-white flex items-center justify-center">
+        <div className="text-2xl">Loading products...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4 bg-gradient-to-br from-purple-600 to-blue-500 min-h-screen text-white">
+      {error && (
+        <div className="bg-red-500 text-white p-4 rounded-lg mb-4 flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => setError(null)}
+            className="text-white hover:text-gray-200"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Categories */}
       <div className="flex space-x-4 mb-6">
         {categories.map((category) => (
@@ -141,20 +170,23 @@ export default function Pos() {
       <div className="grid grid-cols-3 gap-4">
         {/* Products */}
         <div className="col-span-2 grid grid-cols-4 gap-4">
-          {products.map((product, index) => (
+          {filteredProducts.map((product) => (
             <div
-              key={index}
+              key={product.product_id}
               className="bg-white text-black rounded-lg shadow-md p-4 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg"
               onClick={() => handleAddToCart(product)}
             >
               <img
-                src={product.image}
+                src={product.image_url}
                 alt={product.name}
                 className="h-20 w-20 rounded-full mb-4 object-cover"
               />
               <div className="text-center">
                 <div className="font-bold">{product.name}</div>
-                <div className="text-sm">{product.price}</div>
+                <div className="text-sm">₱{product.price.toFixed(2)}</div>
+                <div className="text-xs text-gray-500">
+                  Stock: {product.stock_quantity}
+                </div>
               </div>
             </div>
           ))}
@@ -162,24 +194,25 @@ export default function Pos() {
 
         {/* Cart */}
         <div className="bg-white text-black rounded-lg shadow-md p-4">
-          <h2 className="text-lg font-bold mb-4">Order No: 123125</h2>
+          <h2 className="text-lg font-bold mb-4">
+            Order No: {orderNumber.toString().padStart(6, '0')}
+          </h2>
           <div className="space-y-4 max-h-64 overflow-y-auto">
             {cart.map((item, index) => (
               <div key={index} className="flex justify-between items-center">
                 <div>
                   <div className="font-bold">{item.name}</div>
-                  <div className="text-sm">Price: {item.price}</div>
+                  <div className="text-sm">Price: ₱{item.price.toFixed(2)}</div>
                   <div className="text-sm flex items-center">
                     Quantity:
                     <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
+                      type="number"
+                      min="1"
                       value={item.quantity}
                       onChange={(e) =>
                         handleQuantityChange(
                           index,
-                          parseInt(e.target.value || '0', 10)
+                          parseInt(e.target.value) || 1
                         )
                       }
                       className="ml-2 w-16 border rounded text-center"
@@ -198,18 +231,66 @@ export default function Pos() {
           <div className="mt-4 border-t pt-4">
             <div className="flex justify-between">
               <span>Subtotal:</span>
-              <span>₱{calculateTotal()}</span>
+              <span>₱{calculateSubtotal()}</span>
             </div>
+            {activeDiscount && (
+              <div className="flex justify-between text-green-600">
+                <div className="flex items-center">
+                  <span>{activeDiscount} Discount (10%):</span>
+                  <button
+                    onClick={() => setActiveDiscount(null)}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
+                </div>
+                <span>-₱{calculateDiscount()}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Tax:</span>
-              <span>₱{(calculateTotal() * 0.12).toFixed(2)}</span>
+              <span>
+                ₱
+                {(
+                  (parseFloat(calculateSubtotal()) -
+                    parseFloat(calculateDiscount())) *
+                  0.12
+                ).toFixed(2)}
+              </span>
             </div>
             <div className="flex justify-between font-bold">
               <span>Total:</span>
-              <span>₱{(calculateTotal() * 1.12).toFixed(2)}</span>
+              <span>₱{calculateTotal()}</span>
             </div>
           </div>
-          <button className="w-full bg-purple-600 text-white py-2 rounded-lg mt-4 hover:bg-purple-700">
+          <div className="flex space-x-2 mt-2">
+            <button
+              onClick={() => setActiveDiscount('PWD')}
+              className={`flex-1 py-2 rounded-lg ${
+                activeDiscount === 'PWD'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+              disabled={activeDiscount !== null}
+            >
+              PWD (10%)
+            </button>
+            <button
+              onClick={() => setActiveDiscount('Senior Citizen')}
+              className={`flex-1 py-2 rounded-lg ${
+                activeDiscount === 'Senior Citizen'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 text-gray-700'
+              }`}
+              disabled={activeDiscount !== null}
+            >
+              Senior Citizen (10%)
+            </button>
+          </div>
+          <button
+            onClick={handlePayment}
+            className="w-full bg-purple-600 text-white py-2 rounded-lg mt-4 hover:bg-purple-700"
+          >
             Payment
           </button>
         </div>
