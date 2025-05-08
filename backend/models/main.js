@@ -24,6 +24,6 @@ db.Sequelize = Sequelize;
 
 db.UserRoles = require('./user_roles')(sequelize, Sequelize);
 db.Users = require('./users')(sequelize, Sequelize);
-
+db.Products = require('./products')(sequelize, Sequelize);
 
 module.exports = db;

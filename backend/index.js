@@ -6,7 +6,8 @@ const PORT = process.env.PORT || 5000;
 
 const userRoute = require('./routes/userRoute.js');
 const authRoute = require('./routes/authRoute.js');
-
+const emailRoute = require('./routes/emailRoute.js');
+const productRoute = require('./routes/productRoute.js');
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -16,6 +17,8 @@ app.use('/uploads', express.static('uploads'));
 
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
+app.use('/api/email', emailRoute);
+app.use('/api/products', productRoute);
 
 const db = require('./models/main');
 db.sequelize
