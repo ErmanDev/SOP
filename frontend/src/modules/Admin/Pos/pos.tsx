@@ -121,6 +121,12 @@ export default function Pos() {
       ? products
       : products.filter((product) => product.category === selectedCategory);
 
+  // Ensure product.price is a number before rendering
+  const sanitizedProducts = filteredProducts.map((product) => ({
+    ...product,
+    price: Number(product.price) || 0, // Convert to number or default to 0
+  }));
+
   const handlePayment = () => {
     // Process payment logic here
     setCart([]); // Clear cart after payment
@@ -170,16 +176,16 @@ export default function Pos() {
       <div className="grid grid-cols-3 gap-4">
         {/* Products */}
         <div className="col-span-2 grid grid-cols-4 gap-4">
-          {filteredProducts.map((product) => (
+          {sanitizedProducts.map((product) => (
             <div
               key={product.product_id}
-              className="bg-white text-black rounded-lg shadow-md p-4 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg"
+              className="bg-white text-black rounded-lg shadow-md p-4 flex flex-col items-center justify-center cursor-pointer hover:shadow-lg w-48 h-48"
               onClick={() => handleAddToCart(product)}
             >
               <img
                 src={product.image_url}
                 alt={product.name}
-                className="h-20 w-20 rounded-full mb-4 object-cover"
+                className="h-20 w-20 mb-4 object-cover"
               />
               <div className="text-center">
                 <div className="font-bold">{product.name}</div>
