@@ -28,14 +28,13 @@ export default function Pos() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeDiscount, setActiveDiscount] = useState<string | null>(null);
   const [orderNumber, setOrderNumber] = useState(1);
-
-  const categories: Category[] = [
+  const [categories, setCategories] = useState<Category[]>([
     { id: 'all', name: 'All', count: 0 },
     { id: 'Home Appliance', name: 'Home Appliance', count: 0 },
     { id: 'Gadgets', name: 'Gadgets', count: 0 },
     { id: 'Furnitures', name: 'Furnitures', count: 0 },
     { id: 'Smart Home', name: 'Smart Home', count: 0 },
-  ];
+  ]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,16 +43,18 @@ export default function Pos() {
         const response = await axios.get('http://localhost:5000/api/products');
         setProducts(response.data);
 
-        // Update category counts
-        categories.forEach((category) => {
+        // Update category counts dynamically
+        const updatedCategories = categories.map((category) => {
           if (category.id === 'all') {
-            category.count = response.data.length;
+            return { ...category, count: response.data.length };
           } else {
-            category.count = response.data.filter(
+            const count = response.data.filter(
               (product: Product) => product.category === category.id
             ).length;
+            return { ...category, count };
           }
         });
+        setCategories(updatedCategories);
       } catch (err) {
         setError('Failed to fetch products');
         console.error('Error fetching products:', err);

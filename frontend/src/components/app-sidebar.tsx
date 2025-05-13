@@ -52,7 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     user,
     teams: [
       {
-        name: 'ABENSON',
+        name: 'QuickMart',
         logo: GalleryVerticalEnd,
         plan: 'Enterprise',
       },
