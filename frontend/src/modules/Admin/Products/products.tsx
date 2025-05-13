@@ -1,0 +1,375 @@
+import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+
+interface Product {
+  id: string;
+  name: string;
+  price: string;
+  category: string;
+  stock_quantity: number;
+  status: string;
+  imageUrl: string;
+}
+
+interface NewProduct {
+  name: string;
+  price: string;
+  category: string;
+  image_url: string;
+  description: string;
+  stock_quantity: number;
+}
+
+export default function Products() {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [newProduct, setNewProduct] = useState<NewProduct>({
+    name: '',
+    price: '',
+    category: 'Home Appliance',
+    image_url: '',
+    description: '',
+    stock_quantity: 0,
+  });
+
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5000/api/products');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+
+        const data = await response.json();
+        setProducts(data);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const filteredProducts = products.filter(
+    (product) =>
+      String(product.id).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleAddProduct = () => {
+    setIsAdding(true);
+    setNewProduct({
+      name: '',
+      price: '',
+      category: 'Home Appliance',
+      image_url: '',
+      description: '',
+      stock_quantity: 0,
+    });
+  };
+
+  const handleNewProductChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
+    const { name, value } = e.target;
+    setNewProduct((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleNewProductImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewProduct((prev) => ({
+        ...prev,
+        image_url: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  const handleSaveNewProduct = async () => {
+    // Check if all required fields are filled
+    if (
+      !newProduct.name ||
+      !newProduct.price ||
+      !newProduct.category ||
+      !newProduct.description ||
+      !newProduct.stock_quantity ||
+      !newProduct.image_url
+    ) {
+      toast.error('Please fill in all required fields before saving.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newProduct),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add product');
+      }
+
+      const addedProduct = await response.json();
+      setProducts((prev) => [addedProduct, ...prev]);
+      setIsAdding(false);
+      toast.success('Product added successfully!');
+    } catch (error) {
+      console.error('Error adding product:', error);
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to add product'
+      );
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4 text-center">
+        Loading products...
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4">
+      <div className="border rounded-lg shadow-md p-6 bg-white">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Product Management</h1>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+            />
+            <button
+              onClick={handleAddProduct}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
+            >
+              Create Product
+            </button>
+          </div>
+        </div>
+
+        {products.length === 0 ? (
+          <div className="text-center py-8">No products found</div>
+        ) : (
+          <div className="rounded-lg overflow-hidden">
+            <table className="table-auto w-full border-collapse border border-gray-200">
+              <thead className="bg-purple-600 text-white">
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">ID</th>
+                  <th className="border border-gray-300 px-4 py-2">Name</th>
+                  <th className="border border-gray-300 px-4 py-2">Price</th>
+                  <th className="border border-gray-300 px-4 py-2">Category</th>
+                  <th className="border border-gray-300 px-4 py-2">
+                    Stock Quantity
+                  </th>
+                  <th className="border border-gray-300 px-4 py-2">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedProducts.map((product) => (
+                  <tr key={product.id}>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.id}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.price}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.category}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.stock_quantity}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {product.status}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {totalPages > 0 && (
+          <div className="flex justify-center items-center mt-4 space-x-2">
+            {Array.from({ length: totalPages }, (_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === index + 1
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                {index + 1}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {isAdding && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[800px] max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">Add New Product</h2>
+            <form>
+              <div className="mb-4 flex flex-col items-center">
+                {newProduct.image_url && (
+                  <img
+                    src={newProduct.image_url}
+                    alt="Product Preview"
+                    className="w-24 h-24 rounded-full mb-2"
+                  />
+                )}
+                <div className="mt-2">
+                  <label className="block text-sm font-medium text-center">
+                    Product Image
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleNewProductImageChange}
+                    required
+                    className="mt-1 block w-full text-sm text-gray-500
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-full file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-purple-50 file:text-purple-700
+                      hover:file:bg-purple-100"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={newProduct.name}
+                    onChange={handleNewProductChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter product name"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Price</label>
+                  <input
+                    type="text"
+                    name="price"
+                    value={newProduct.price}
+                    onChange={handleNewProductChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter product price"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Category</label>
+                  <select
+                    name="category"
+                    value={newProduct.category}
+                    onChange={handleNewProductChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                  >
+                    <option value="Home Appliance">Home Appliance</option>
+                    <option value="Gadgets">Gadgets</option>
+                    <option value="Furnitures">Furnitures</option>
+                    <option value="Smart Home">Smart Home</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Stock Quantity
+                  </label>
+                  <input
+                    type="number"
+                    name="stock_quantity"
+                    value={newProduct.stock_quantity}
+                    onChange={handleNewProductChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter stock quantity"
+                  />
+                </div>
+                <div className="mb-4 col-span-2">
+                  <label className="block text-sm font-medium">
+                    Description
+                  </label>
+                  <textarea
+                    name="description"
+                    value={newProduct.description}
+                    onChange={handleNewProductChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter product description"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  onClick={handleSaveNewProduct}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  onClick={() => setIsAdding(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

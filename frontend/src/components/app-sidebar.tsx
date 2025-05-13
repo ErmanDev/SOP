@@ -9,6 +9,7 @@ import {
   Percent,
   HandCoins,
   Users,
+  Boxes
 } from 'lucide-react';
 
 import { NavMain } from '@/components/nav-main';
@@ -22,6 +23,7 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import Cookies from 'js-cookie';
+import { url } from 'inspector';
 
 const capitalizeWords = (str: string) => {
   return str
@@ -105,6 +107,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: 'Reports',
         url: '/reports',
         icon: ClipboardMinus,
+        roles: ['admin'],
+      },
+      {
+        title: 'Products',
+        url: '/products',
+        icon: Boxes,
         roles: ['admin'],
       },
     ],

@@ -13,6 +13,7 @@ import Sales from '@/modules/Admin/Sales/sales';
 import Pos from '@/modules/Admin/Pos/pos';
 import Payroll from '@/modules/Admin/Payroll/payroll';
 import Reports from '@/modules/Admin/Reports/reports';
+import Products from '@/modules/Admin/Products/products';
 
 export const router = createBrowserRouter([
   {
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
           {
             path: '/reports',
             Component: Reports,
+          },
+          {
+            path: '/products',
+            Component: Products,
           },
         ],
       },
