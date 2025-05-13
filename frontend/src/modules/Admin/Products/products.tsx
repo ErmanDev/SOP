@@ -141,8 +141,17 @@ export default function Products() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to add product');
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to add product');
+        } else {
+          const errorText = await response.text();
+          console.error('Server error response:', errorText);
+          throw new Error(
+            'Unexpected server error. Please check the server logs.'
+          );
+        }
       }
 
       const addedProduct = await response.json();
