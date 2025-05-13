@@ -176,7 +176,7 @@ export default function Pos() {
       {/* Main Content */}
       <div className="grid grid-cols-3 gap-4">
         {/* Products */}
-        <div className="col-span-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4">
+        <div className="col-span-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {sanitizedProducts.map((product) => (
             <div
               key={product.product_id}
