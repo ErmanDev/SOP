@@ -215,32 +215,35 @@ export default function Pos() {
           </h2>
           <div className="space-y-4 max-h-64 overflow-y-auto h-64">
             {cart.map((item, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <div>
-                  <div className="font-bold">{item.name}</div>
-                  <div className="text-sm">Price: ₱{item.price.toFixed(2)}</div>
-                  <div className="text-sm flex items-center">
-                    Quantity:
-                    <input
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) =>
-                        handleQuantityChange(
-                          index,
-                          parseInt(e.target.value) || 1
-                        )
-                      }
-                      className="ml-2 w-16 border rounded text-center"
-                    />
+              <div key={index} className="flex items-center space-x-4">
+                <img
+                  src={item.image_url}
+                  alt={item.name}
+                  className="w-16 h-16 object-cover rounded-md border border-gray-300"
+                />
+                <div className="flex-1">
+                  <div className="font-bold text-lg">{item.name}</div>
+                  <div className="text-sm text-gray-700">
+                    ₱{item.price.toFixed(2)}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleRemoveFromCart(index)}
-                  className="text-red-500 hover:underline"
-                >
-                  Remove
-                </button>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      handleQuantityChange(index, parseInt(e.target.value) || 1)
+                    }
+                    className="w-16 border rounded text-center"
+                  />
+                  <button
+                    onClick={() => handleRemoveFromCart(index)}
+                    className="text-red-500 hover:underline"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             ))}
           </div>

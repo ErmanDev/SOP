@@ -117,15 +117,72 @@ export default function Products() {
     }));
   };
 
-  const handleNewProductImageChange = (
+  const handleNewProductImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setNewProduct((prev) => ({
-        ...prev,
-        image_url: URL.createObjectURL(file),
-      }));
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'quickmart'); // Replace with your Cloudinary upload preset
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dhoi760j1/image/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+
+        setNewProduct((prev) => ({
+          ...prev,
+          image_url: data.secure_url,
+        }));
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to upload image');
+      }
+    }
+  };
+
+  const handleEditProductImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'quickmart'); // Replace with your Cloudinary upload preset
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dhoi760j1/image/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+
+        setSelectedProduct((prev) =>
+          prev ? { ...prev, image_url: data.secure_url } : prev
+        );
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to upload image');
+      }
     }
   };
 
@@ -540,15 +597,7 @@ export default function Products() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const image_url = URL.createObjectURL(file);
-                      setSelectedProduct((prev) =>
-                        prev ? { ...prev, image_url: image_url } : prev
-                      );
-                    }
-                  }}
+                  onChange={handleEditProductImageChange}
                   className="mt-1 block w-full text-sm text-gray-500
                     file:mr-4 file:py-2 file:px-4
                     file:rounded-full file:border-0
