@@ -1,5 +1,8 @@
 const express = require('express');
 const productController = require('../controllers/productController');
+const upload = require('../middlewares/multer');
+const cloudinaryService = require('../services/cloudinaryService');
+
 const router = express.Router();
 
 // Get all products
@@ -11,11 +14,37 @@ router.get('/:product_id', productController.getProductById);
 // Get products by category
 router.get('/category/:category', productController.getProductsByCategory);
 
-// Create new product
-router.post('/', productController.createProduct);
+// Upload product image and create product
+router.post('/', upload.single('image'), async (req, res) => {
+  try {
+    if (req.file) {
+      const result = await cloudinaryService.uploadImage(
+        req.file.path,
+        'products'
+      );
+      req.body.image_url = result.secure_url;
+    }
+    await productController.createProduct(req, res);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-// Update product
-router.put('/:product_id', productController.updateProduct);
+// Upload product image and update product
+router.put('/:product_id', upload.single('image'), async (req, res) => {
+  try {
+    if (req.file) {
+      const result = await cloudinaryService.uploadImage(
+        req.file.path,
+        'products'
+      );
+      req.body.image_url = result.secure_url;
+    }
+    await productController.updateProduct(req, res);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // Delete product
 router.delete('/:product_id', productController.deleteProduct);
@@ -26,4 +55,4 @@ router.patch('/:product_id/stock', productController.updateProductStock);
 // Update product status
 router.patch('/:product_id/status', productController.updateProductStatus);
 
-module.exports = router; 
+module.exports = router;
