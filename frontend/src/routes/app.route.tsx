@@ -14,6 +14,7 @@ import Pos from '@/modules/Admin/Pos/pos';
 import Payroll from '@/modules/Admin/Payroll/payroll';
 import Reports from '@/modules/Admin/Reports/reports';
 import Products from '@/modules/Admin/Products/products';
+import Discounts from '@/modules/Admin/Discounts/discount';
 
 export const router = createBrowserRouter([
   {
@@ -94,6 +95,10 @@ export const router = createBrowserRouter([
             path: '/products',
             Component: Products,
           },
+          {
+            path: '/discount',
+            Component: Discounts
+          }
         ],
       },
     ],
