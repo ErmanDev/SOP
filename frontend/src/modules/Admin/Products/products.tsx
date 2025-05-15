@@ -18,7 +18,7 @@ interface Product {
   category: string;
   stock_quantity: number;
   status: string;
-  imageUrl: string;
+  image_url: string;
 }
 
 interface NewProduct {
@@ -44,6 +44,8 @@ export default function Products() {
     description: '',
     stock_quantity: 0,
   });
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const itemsPerPage = 5;
 
@@ -200,7 +202,51 @@ export default function Products() {
   };
 
   const handleEditProduct = (productId: string) => {
-    console.log(`Edit product with ID: ${productId}`);
+    const productToEdit = products.find(
+      (product) => product.id === Number(productId)
+    );
+    if (productToEdit) {
+      setSelectedProduct(productToEdit);
+      setIsEditing(true);
+    }
+  };
+
+  const handleCloseEdit = () => {
+    setSelectedProduct(null);
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedProduct) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/products/${selectedProduct.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(selectedProduct),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === selectedProduct.id ? selectedProduct : product
+        )
+      );
+
+      toast.success('Product updated successfully!');
+      handleCloseEdit();
+    } catch (error) {
+      console.error('Error updating product:', error);
+      toast.error('Failed to update product');
+    }
   };
 
   if (loading) {
@@ -242,12 +288,14 @@ export default function Products() {
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">ID</th>
                   <th className="border border-gray-300 px-4 py-2">Name</th>
+                  <th className="border border-gray-300 px-4 py-2">Image</th>
                   <th className="border border-gray-300 px-4 py-2">Price</th>
                   <th className="border border-gray-300 px-4 py-2">Category</th>
                   <th className="border border-gray-300 px-4 py-2">
                     Stock Quantity
                   </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
+
                   <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
               </thead>
@@ -259,6 +307,13 @@ export default function Products() {
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {product.name}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <img
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-16 h-16 object-cover rounded-md mx-auto"
+                      />
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       {product.price}
@@ -280,6 +335,7 @@ export default function Products() {
                         {product.status}
                       </span>
                     </td>
+
                     <td className="border border-gray-300 px-4 py-2">
                       <div className="flex justify-center space-x-4">
                         <button
@@ -456,6 +512,147 @@ export default function Products() {
                   type="button"
                   className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                   onClick={() => setIsAdding(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isEditing && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-[800px] max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+            <div className="mb-4 flex flex-col items-center">
+              {selectedProduct?.image_url && (
+                <img
+                  src={selectedProduct.image_url}
+                  alt="Product Preview"
+                  className="w-24 h-24 rounded-full mb-2"
+                />
+              )}
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-center">
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const image_url = URL.createObjectURL(file);
+                      setSelectedProduct((prev) =>
+                        prev ? { ...prev, image_url: image_url } : prev
+                      );
+                    }
+                  }}
+                  className="mt-1 block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-purple-50 file:text-purple-700
+                    hover:file:bg-purple-100"
+                />
+              </div>
+            </div>
+            <form>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">ID</label>
+                  <input
+                    type="text"
+                    value={selectedProduct?.id}
+                    disabled
+                    className="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Name</label>
+                  <input
+                    type="text"
+                    value={selectedProduct?.name}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev ? { ...prev, name: e.target.value } : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Price</label>
+                  <input
+                    type="text"
+                    value={selectedProduct?.price}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev ? { ...prev, price: e.target.value } : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Category</label>
+                  <input
+                    type="text"
+                    value={selectedProduct?.category}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev ? { ...prev, category: e.target.value } : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Stock Quantity
+                  </label>
+                  <input
+                    type="number"
+                    value={selectedProduct?.stock_quantity}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev
+                          ? { ...prev, stock_quantity: Number(e.target.value) }
+                          : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">Status</label>
+                  <select
+                    value={selectedProduct?.status}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev ? { ...prev, status: e.target.value } : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  onClick={handleSaveEdit}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  onClick={handleCloseEdit}
                 >
                   Cancel
                 </button>

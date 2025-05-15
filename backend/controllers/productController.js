@@ -82,7 +82,7 @@ exports.updateProduct = async (req, res) => {
         stock_quantity,
       },
       {
-        where: { product_id: req.params.product_id },
+        where: { id: req.params.product_id }, // Use `id` instead of `product_id`
       }
     );
 
@@ -91,7 +91,7 @@ exports.updateProduct = async (req, res) => {
     }
 
     const updatedProduct = await db.Products.findOne({
-      where: { product_id: req.params.product_id },
+      where: { id: req.params.product_id }, // Use `id` instead of `product_id`
     });
 
     res.status(200).json(updatedProduct);

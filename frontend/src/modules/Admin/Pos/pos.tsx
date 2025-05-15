@@ -44,17 +44,18 @@ export default function Pos() {
         setProducts(response.data);
 
         // Update category counts dynamically
-        const updatedCategories = categories.map((category) => {
-          if (category.id === 'all') {
-            return { ...category, count: response.data.length };
-          } else {
-            const count = response.data.filter(
-              (product: Product) => product.category === category.id
-            ).length;
-            return { ...category, count };
-          }
-        });
-        setCategories(updatedCategories);
+        setCategories((prevCategories) =>
+          prevCategories.map((category) => {
+            if (category.id === 'all') {
+              return { ...category, count: response.data.length };
+            } else {
+              const count = response.data.filter(
+                (product: Product) => product.category === category.id
+              ).length;
+              return { ...category, count };
+            }
+          })
+        );
       } catch (err) {
         setError('Failed to fetch products');
         console.error('Error fetching products:', err);
@@ -64,7 +65,7 @@ export default function Pos() {
     };
 
     fetchProducts();
-  }, [categories]);
+  }, []);
 
   const handleAddToCart = (product: Product) => {
     setCart((prevCart) => {
@@ -212,7 +213,7 @@ export default function Pos() {
           <h2 className="text-lg font-bold mb-4">
             Order No: {orderNumber.toString().padStart(6, '0')}
           </h2>
-          <div className="space-y-4 max-h-64 overflow-y-auto">
+          <div className="space-y-4 max-h-64 overflow-y-auto h-64">
             {cart.map((item, index) => (
               <div key={index} className="flex justify-between items-center">
                 <div>
@@ -284,7 +285,7 @@ export default function Pos() {
               className={`flex-1 py-2 rounded-lg ${
                 activeDiscount === 'PWD'
                   ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
               disabled={activeDiscount !== null}
             >
@@ -295,7 +296,7 @@ export default function Pos() {
               className={`flex-1 py-2 rounded-lg ${
                 activeDiscount === 'Senior Citizen'
                   ? 'bg-green-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
               }`}
               disabled={activeDiscount !== null}
             >
