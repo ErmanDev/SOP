@@ -8,6 +8,7 @@ const userRoute = require('./routes/userRoute.js');
 const authRoute = require('./routes/authRoute.js');
 const emailRoute = require('./routes/emailRoute.js');
 const productRoute = require('./routes/productRoute.js');
+const discountRoute = require('./routes/discountRoute.js');
 //middleware
 app.use(cors());
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/email', emailRoute);
 app.use('/api/products', productRoute);
+app.use('/api/discounts', discountRoute);
 
 const db = require('./models/main');
 db.sequelize

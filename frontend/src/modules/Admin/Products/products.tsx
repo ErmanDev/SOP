@@ -53,7 +53,7 @@ export default function Products() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/products');
+        const response = await fetch('http://localhost:5000/api/products/');
 
         if (!response.ok) {
           throw new Error('Failed to fetch products');
@@ -284,7 +284,14 @@ export default function Products() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(selectedProduct),
+          body: JSON.stringify({
+            name: selectedProduct.name,
+            price: selectedProduct.price,
+            category: selectedProduct.category, // Ensure category is included
+            stock_quantity: selectedProduct.stock_quantity,
+            status: selectedProduct.status, // Ensure status is included
+            image_url: selectedProduct.image_url,
+          }),
         }
       );
 
@@ -292,9 +299,11 @@ export default function Products() {
         throw new Error('Failed to update product');
       }
 
+      const updatedProduct = await response.json();
+
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
-          product.id === selectedProduct.id ? selectedProduct : product
+          product.id === updatedProduct.id ? updatedProduct : product
         )
       );
 
@@ -303,6 +312,34 @@ export default function Products() {
     } catch (error) {
       console.error('Error updating product:', error);
       toast.error('Failed to update product');
+    }
+  };
+
+  const handleApplyDiscount = async () => {
+    try {
+      const dummyDiscountPercentage = 10; // Dummy discount percentage
+
+      const response = await fetch(
+        'http://localhost:5000/api/discounts/apply',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ percentage: dummyDiscountPercentage }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to apply discount');
+      }
+
+      toast.success(
+        `Discount of ${dummyDiscountPercentage}% applied to all products!`
+      );
+    } catch (error) {
+      console.error('Error applying discount:', error);
+      toast.error('Failed to apply discount');
     }
   };
 
@@ -332,6 +369,12 @@ export default function Products() {
               className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
             >
               Create Product
+            </button>
+            <button
+              onClick={handleApplyDiscount}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
+            >
+              Apply Discount
             </button>
           </div>
         </div>
@@ -646,8 +689,7 @@ export default function Products() {
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium">Category</label>
-                  <input
-                    type="text"
+                  <select
                     value={selectedProduct?.category}
                     onChange={(e) =>
                       setSelectedProduct((prev) =>
@@ -655,7 +697,12 @@ export default function Products() {
                       )
                     }
                     className="w-full border rounded px-3 py-2"
-                  />
+                  >
+                    <option value="Home Appliance">Home Appliance</option>
+                    <option value="Gadgets">Gadgets</option>
+                    <option value="Furnitures">Furnitures</option>
+                    <option value="Smart Home">Smart Home</option>
+                  </select>
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium">

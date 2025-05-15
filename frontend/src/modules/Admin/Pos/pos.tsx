@@ -8,6 +8,7 @@ interface Product {
   category: string;
   image_url: string;
   stock_quantity: number;
+  status?: string;
 }
 
 interface CartItem extends Product {
@@ -105,26 +106,24 @@ export default function Pos() {
       .toFixed(2);
   };
 
+  // Updated calculateDiscount to include a 12% local tax for the Philippines.
   const calculateDiscount = () => {
     if (!activeDiscount) return '0';
     const subtotal = parseFloat(calculateSubtotal());
-    if (activeDiscount === 'PWD') {
-      return (subtotal * 0.1).toFixed(2);
-    }
-    return (subtotal * 0.15).toFixed(2);
+    const discount = activeDiscount === 'PWD' ? 0.1 : 0.15;
+    const tax = 0.12; // 12% local tax
+    return (subtotal * discount + subtotal * tax).toFixed(2);
   };
 
-  const calculateTotal = () => {
-    const subtotal = parseFloat(calculateSubtotal());
-    const discount = parseFloat(calculateDiscount());
-    const tax = (subtotal - discount) * 0.12;
-    return (subtotal - discount + tax).toFixed(2);
-  };
-
+  // Updated filteredProducts to exclude products with a status of 'Inactive'.
   const filteredProducts =
     selectedCategory === 'all'
-      ? products
-      : products.filter((product) => product.category === selectedCategory);
+      ? products.filter((product) => product.status !== 'Inactive')
+      : products.filter(
+          (product) =>
+            product.category === selectedCategory &&
+            product.status !== 'Inactive'
+        );
 
   // Ensure product.price is a number before rendering
   const sanitizedProducts = filteredProducts.map((product) => ({
@@ -266,20 +265,15 @@ export default function Pos() {
                 <span>-₱{calculateDiscount()}</span>
               </div>
             )}
-            <div className="flex justify-between">
-              <span>Tax:</span>
+            <div className="flex justify-between font-bold">
+              <span>Total:</span>
               <span>
                 ₱
                 {(
-                  (parseFloat(calculateSubtotal()) -
-                    parseFloat(calculateDiscount())) *
-                  0.12
+                  parseFloat(calculateSubtotal()) -
+                  parseFloat(calculateDiscount())
                 ).toFixed(2)}
               </span>
-            </div>
-            <div className="flex justify-between font-bold">
-              <span>Total:</span>
-              <span>₱{calculateTotal()}</span>
             </div>
           </div>
           <div className="flex space-x-2 mt-2">

@@ -69,8 +69,15 @@ exports.createProduct = async (req, res) => {
 // Update product
 exports.updateProduct = async (req, res) => {
   try {
-    const { name, price, category, image_url, description, stock_quantity } =
-      req.body;
+    const {
+      name,
+      price,
+      category,
+      image_url,
+      description,
+      stock_quantity,
+      status,
+    } = req.body;
 
     const [updated] = await db.Products.update(
       {
@@ -80,9 +87,10 @@ exports.updateProduct = async (req, res) => {
         image_url,
         description,
         stock_quantity,
+        status, // Ensure `status` is included in the update
       },
       {
-        where: { id: req.params.product_id }, // Use `id` instead of `product_id`
+        where: { id: req.params.product_id },
       }
     );
 
@@ -91,7 +99,7 @@ exports.updateProduct = async (req, res) => {
     }
 
     const updatedProduct = await db.Products.findOne({
-      where: { id: req.params.product_id }, // Use `id` instead of `product_id`
+      where: { id: req.params.product_id },
     });
 
     res.status(200).json(updatedProduct);

@@ -166,10 +166,37 @@ export default function Employees() {
     });
   };
 
-  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfileImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'quickmart'); // Replace with your Cloudinary upload preset
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dhoi760j1/image/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+        setPreviewUrl(data.secure_url);
+        setSelectedEmployee((prev) =>
+          prev ? { ...prev, profile_url: data.secure_url } : prev
+        );
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to upload image');
+      }
     }
   };
 
@@ -270,16 +297,38 @@ export default function Employees() {
     }));
   };
 
-  const handleNewEmployeeImageChange = (
+  const handleNewEmployeeImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-      setNewEmployee((prev) => ({
-        ...prev,
-        profile_url: URL.createObjectURL(file),
-      }));
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'quickmart'); // Replace with your Cloudinary upload preset
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/dhoi760j1/image/upload',
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const data = await response.json();
+        setPreviewUrl(data.secure_url);
+        setNewEmployee((prev) => ({
+          ...prev,
+          profile_url: data.secure_url,
+        }));
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to upload image');
+      }
     }
   };
 
