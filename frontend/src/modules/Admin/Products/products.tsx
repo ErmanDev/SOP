@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '../../../components/ui/alert-dialog';
+import { Trash2, Pencil } from 'lucide-react';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   price: string;
   category: string;
@@ -166,6 +176,33 @@ export default function Products() {
     }
   };
 
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/products/${productId}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      setProducts((prev) =>
+        prev.filter((product) => product.id !== Number(productId))
+      );
+      toast.success('Product deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      toast.error('Failed to delete product');
+    }
+  };
+
+  const handleEditProduct = (productId: string) => {
+    console.log(`Edit product with ID: ${productId}`);
+  };
+
   if (loading) {
     return (
       <div className="container mx-auto p-4 text-center">
@@ -211,11 +248,12 @@ export default function Products() {
                     Stock Quantity
                   </th>
                   <th className="border border-gray-300 px-4 py-2">Status</th>
+                  <th className="border border-gray-300 px-4 py-2">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedProducts.map((product) => (
-                  <tr key={product.id}>
+                  <tr key={product.id} className="text-center">
                     <td className="border border-gray-300 px-4 py-2">
                       {product.id}
                     </td>
@@ -232,7 +270,53 @@ export default function Products() {
                       {product.stock_quantity}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {product.status}
+                      <span
+                        className={`px-2 py-1 rounded-full text-white text-sm ${
+                          product.status === 'Active'
+                            ? 'bg-green-500'
+                            : 'bg-red-500'
+                        }`}
+                      >
+                        {product.status}
+                      </span>
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <div className="flex justify-center space-x-4">
+                        <button
+                          onClick={() => handleEditProduct(String(product.id))}
+                          className="bg-yellow-300 p-2 text-black hover:bg-yellow-400 rounded-md"
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button className="text-white bg-red-600 p-2 hover:bg-red-700 rounded-md">
+                              <Trash2 size={16} />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <h2 className="text-lg font-bold">
+                                Confirm Deletion
+                              </h2>
+                              <p>
+                                Are you sure you want to delete this product?
+                              </p>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() =>
+                                  handleDeleteProduct(String(product.id))
+                                }
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -245,6 +329,7 @@ export default function Products() {
           <div className="flex justify-center items-center mt-4 space-x-2">
             {Array.from({ length: totalPages }, (_, index) => (
               <button
+                type="button"
                 key={index}
                 onClick={() => handlePageChange(index + 1)}
                 className={`px-3 py-1 rounded ${

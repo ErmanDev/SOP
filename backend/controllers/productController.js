@@ -104,7 +104,7 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const deleted = await db.Products.destroy({
-      where: { product_id: req.params.product_id },
+      where: { id: req.params.product_id }, // Use `id` instead of `product_id`
     });
 
     if (!deleted) {

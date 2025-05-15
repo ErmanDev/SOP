@@ -107,7 +107,7 @@ export default function Pos() {
   const calculateDiscount = () => {
     if (!activeDiscount) return '0';
     const subtotal = parseFloat(calculateSubtotal());
-    return (subtotal * 0.1).toFixed(2);
+    return (subtotal * 0.15).toFixed(2); // Updated discount to 15%
   };
 
   const calculateTotal = () => {
@@ -248,7 +248,7 @@ export default function Pos() {
             {activeDiscount && (
               <div className="flex justify-between text-green-600">
                 <div className="flex items-center">
-                  <span>{activeDiscount} Discount (10%):</span>
+                  <span>{activeDiscount} Discount (15%):</span>
                   <button
                     onClick={() => setActiveDiscount(null)}
                     className="ml-2 text-red-500 hover:text-red-700"
@@ -285,7 +285,7 @@ export default function Pos() {
               }`}
               disabled={activeDiscount !== null}
             >
-              PWD (10%)
+              PWD (15%)
             </button>
             <button
               onClick={() => setActiveDiscount('Senior Citizen')}
@@ -296,7 +296,7 @@ export default function Pos() {
               }`}
               disabled={activeDiscount !== null}
             >
-              Senior Citizen (10%)
+              Senior Citizen (15%)
             </button>
           </div>
           <button
