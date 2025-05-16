@@ -27,4 +27,11 @@ db.Users = require('./users')(sequelize, Sequelize);
 db.Products = require('./products')(sequelize, Sequelize);
 db.Discounts = require('./discount')(sequelize, Sequelize);
 
+// Add associations
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+
 module.exports = db;

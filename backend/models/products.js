@@ -48,6 +48,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'Active',
       },
+      discountId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'Discounts',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'SET NULL',
+      },
     },
     {
       tableName: 'Products',
@@ -70,6 +80,14 @@ module.exports = (sequelize, DataTypes) => {
       );
     }
   });
+
+  // Association for Discount (foreign key)
+  Products.associate = function (models) {
+    Products.belongsTo(models.Discounts, {
+      foreignKey: 'discountId',
+      as: 'discount',
+    });
+  };
 
   return Products;
 };

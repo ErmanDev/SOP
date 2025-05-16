@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root", // replace with your DB user or set via env
+    "password": "",    // replace with your DB password or set via env
+    "database": "quickmart", // replace with your DB name or set via env
+    "host": "127.0.0.1", // replace with your DB host or set via env
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "",
+    "database": "quickmart_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "",
+    "database": "quickmart_prod",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
