@@ -417,10 +417,10 @@ export default function Employees() {
             />
             <button
               onClick={handleAddEmployee}
-              className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              type="button"
             >
-              <Plus className="h-4 w-4" />
-              Add Employee
+              Register Employee
             </button>
           </div>
         </div>
@@ -686,102 +686,89 @@ export default function Employees() {
 
       {isAdding && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-[800px] max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Add New Employee</h2>
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-bold mb-4">Register Employee</h2>
             <form>
-              <div className="mb-4 flex flex-col items-center">
-                {previewUrl ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Employee ID</label>
+                <input
+                  type="text"
+                  name="user_id"
+                  value={newEmployee.user_id}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Full Name</label>
+                <input
+                  type="text"
+                  name="full_name"
+                  value={newEmployee.full_name}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={newEmployee.email}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={newEmployee.phone}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={newEmployee.password}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Status</label>
+                <select
+                  name="status"
+                  value={newEmployee.status}
+                  onChange={handleNewEmployeeChange}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="Full-Time">Full-Time</option>
+                  <option value="Part-Time">Part-Time</option>
+                  <option value="Contract">Contract</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">
+                  Profile Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleNewEmployeeImageChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {previewUrl && (
                   <img
                     src={previewUrl}
-                    alt="Profile Preview"
-                    className="w-24 h-24 rounded-full mb-2"
+                    alt="Preview"
+                    className="w-20 h-20 rounded-full mt-2 mx-auto"
                   />
-                ) : null}
-                <div className="mt-2">
-                  <label className="block text-sm font-medium text-center">
-                    Profile Image
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleNewEmployeeImageChange}
-                    className="mt-1 block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-full file:border-0
-                      file:text-sm file:font-semibold
-                      file:bg-purple-50 file:text-purple-700
-                      hover:file:bg-purple-100"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">User ID</label>
-                  <input
-                    type="text"
-                    name="user_id"
-                    value={newEmployee.user_id}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Enter user ID"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Full Name</label>
-                  <input
-                    type="text"
-                    name="full_name"
-                    value={newEmployee.full_name}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Enter full name"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={newEmployee.email}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Enter email"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Phone</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={newEmployee.phone}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Enter phone number"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={newEmployee.password}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Enter password"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">Status</label>
-                  <select
-                    name="status"
-                    value={newEmployee.status}
-                    onChange={handleNewEmployeeChange}
-                    className="w-full border rounded px-3 py-2"
-                  >
-                    <option value="Full-Time">Full Time</option>
-                    <option value="Part-Time">Part Time</option>
-                  </select>
-                </div>
+                )}
               </div>
               <div className="flex justify-end space-x-2 mt-4">
                 <button

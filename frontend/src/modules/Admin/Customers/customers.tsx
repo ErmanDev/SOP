@@ -9,8 +9,18 @@ import {
 import { EyeIcon } from 'lucide-react';
 import { useState } from 'react';
 
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  totalAmount: string;
+  membership: string;
+  dateOfPurchase: string;
+}
+
 export default function Customer() {
-  const customers = [
+  const customers: Customer[] = [
     {
       id: 1,
       name: 'John Doe',
@@ -44,6 +54,46 @@ export default function Customer() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  const [isAdding, setIsAdding] = useState(false);
+  const [newCustomer, setNewCustomer] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    totalAmount: '',
+    membership: '',
+    dateOfPurchase: '',
+  });
+
+  const handleAddCustomer = () => {
+    setIsAdding(true);
+    setNewCustomer({
+      name: '',
+      email: '',
+      phone: '',
+      totalAmount: '',
+      membership: '',
+      dateOfPurchase: '',
+    });
+  };
+
+  const handleNewCustomerChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setNewCustomer((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSaveNewCustomer = async () => {
+    customers.push({
+      id: customers.length + 1,
+      ...newCustomer,
+    });
+    setIsAdding(false);
+  };
+
   // Filter customers based on the search term
   const filteredCustomers = customers.filter((customer) =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -56,19 +106,21 @@ export default function Customer() {
     currentPage * itemsPerPage
   );
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to the first page when searching
   };
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleView = (customer) => {
+  const handleView = (customer: Customer) => {
     setSelectedCustomer(customer);
     setIsEditing(false);
   };
@@ -82,12 +134,9 @@ export default function Customer() {
     setIsEditing(false);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSelectedCustomer((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setSelectedCustomer((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
   return (
@@ -95,13 +144,22 @@ export default function Customer() {
       <div className="border rounded-lg shadow-md p-6 bg-white">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Customer Management</h1>
-          <input
-            type="text"
-            placeholder="Search customers..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
-          />
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              placeholder="Search customers..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+            />
+            <button
+              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+              onClick={handleAddCustomer}
+              type="button"
+            >
+              Register Customer
+            </button>
+          </div>
         </div>
 
         <div className="rounded-lg overflow-hidden">
@@ -178,6 +236,100 @@ export default function Customer() {
           ))}
         </div>
       </div>
+
+      {isAdding && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-bold mb-4">Register Customer</h2>
+            <form>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={newCustomer.name}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={newCustomer.email}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Phone</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={newCustomer.phone}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">
+                  Total Amount
+                </label>
+                <input
+                  type="text"
+                  name="totalAmount"
+                  value={newCustomer.totalAmount}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Membership</label>
+                <select
+                  name="membership"
+                  value={newCustomer.membership}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="">Select Membership</option>
+                  <option value="Silver">Silver</option>
+                  <option value="Gold">Gold</option>
+                  <option value="Platinum">Platinum</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">
+                  Date of Purchase
+                </label>
+                <input
+                  type="date"
+                  name="dateOfPurchase"
+                  value={newCustomer.dateOfPurchase}
+                  onChange={handleNewCustomerChange}
+                  className="w-full border rounded px-3 py-2"
+                />
+              </div>
+              <div className="flex justify-end space-x-2 mt-4">
+                <button
+                  type="button"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                  onClick={handleSaveNewCustomer}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                  onClick={() => setIsAdding(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {selectedCustomer && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
