@@ -315,34 +315,6 @@ export default function Products() {
     }
   };
 
-  const handleApplyDiscount = async () => {
-    try {
-      const dummyDiscountPercentage = 10; // Dummy discount percentage
-
-      const response = await fetch(
-        'http://localhost:5000/api/discounts/apply',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ percentage: dummyDiscountPercentage }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to apply discount');
-      }
-
-      toast.success(
-        `Discount of ${dummyDiscountPercentage}% applied to all products!`
-      );
-    } catch (error) {
-      console.error('Error applying discount:', error);
-      toast.error('Failed to apply discount');
-    }
-  };
-
   if (loading) {
     return (
       <div className="container mx-auto p-4 text-center">
@@ -369,12 +341,6 @@ export default function Products() {
               className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
             >
               Create Product
-            </button>
-            <button
-              onClick={handleApplyDiscount}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
-            >
-              Apply Discount
             </button>
           </div>
         </div>

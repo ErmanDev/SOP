@@ -1,14 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const {
-  createDiscount,
-  applyDiscountToAllProducts,
-  getDiscounts,
-} = require('../controllers/discountController');
-
+const discountController = require('../controllers/discountController');
 // Routes for discounts
-router.post('/create', createDiscount);
-router.post('/apply', applyDiscountToAllProducts);
-router.get('/', getDiscounts);
-
+router.post('/create', discountController.createDiscount);
+router.post('/apply', discountController.applyDiscountToAllProducts);
+router.get('/', discountController.getDiscounts);
+router.delete('/:id', discountController.deleteDiscount);
 module.exports = router;

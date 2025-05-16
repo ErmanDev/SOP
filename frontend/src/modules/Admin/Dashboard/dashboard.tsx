@@ -157,13 +157,13 @@ export default function Dashboard() {
           icon={<DollarSign className="h-4 w-4" />}
           title="Sales Today"
           value="₱0"
-          trend={3.7}
+          trend={0}
         />
         <StatCard
           icon={<User2 className="h-4 w-4" />}
           title="Total Customers"
           value="0"
-          trend={-2.5}
+          trend={0}
         />
         <StatCard
           icon={<DollarSign className="h-6 w-6" />}

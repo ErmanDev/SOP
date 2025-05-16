@@ -114,25 +114,25 @@ export default function Reports() {
               icon={<DollarSign className="h-4 w-4" />}
               title="Total Sales"
               value="₱45,231.89"
-              trend={20.1}
+              trend={0}
             />
             <StatCard
               icon={<FileText className="h-4 w-4" />}
               title="Total Orders"
               value="2,350"
-              trend={10.5}
+              trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Average Order Value"
               value="₱1,200"
-              trend={-2.5}
+              trend={0}
             />
             <StatCard
               icon={<TrendingUp className="h-4 w-4" />}
               title="Profit Margin"
               value="32.5%"
-              trend={5.2}
+              trend={0}
             />
           </>
         );
@@ -143,25 +143,25 @@ export default function Reports() {
               icon={<Package className="h-4 w-4" />}
               title="Total Products"
               value="1,234"
-              trend={5.1}
+              trend={0}
             />
             <StatCard
               icon={<Package className="h-4 w-4" />}
               title="Low Stock Items"
               value="45"
-              trend={-2.5}
+              trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Inventory Value"
               value="₱234,567"
-              trend={8.3}
+              trend={0}
             />
             <StatCard
               icon={<TrendingUp className="h-4 w-4" />}
               title="Stock Turnover"
               value="4.2x"
-              trend={12.5}
+              trend={0}
             />
           </>
         );
@@ -172,25 +172,25 @@ export default function Reports() {
               icon={<Users className="h-4 w-4" />}
               title="Total Employees"
               value="45"
-              trend={2.1}
+              trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Total Payroll"
               value="₱450,000"
-              trend={5.5}
+              trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Average Salary"
               value="₱10,000"
-              trend={3.5}
+              trend={0}
             />
             <StatCard
               icon={<TrendingUp className="h-4 w-4" />}
               title="Payroll Efficiency"
               value="98.5%"
-              trend={1.2}
+              trend={0}
             />
           </>
         );
