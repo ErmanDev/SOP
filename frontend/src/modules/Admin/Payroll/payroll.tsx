@@ -101,13 +101,18 @@ export default function Payroll() {
       <div className="border rounded-lg shadow-md p-6 bg-white">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Payroll Management</h1>
-          <input
-            type="text"
-            placeholder="Search payroll..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search payroll..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+            />
+            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700">
+              Create Payroll
+            </button>
+          </div>
         </div>
         <div className="rounded-lg overflow-hidden">
           <Table>

@@ -48,6 +48,15 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'Active',
       },
+      discount_percentage: {
+        type: DataTypes.DECIMAL(5, 2),
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          min: 0,
+          max: 100,
+        },
+      },
       discountId: {
         type: DataTypes.INTEGER,
         allowNull: true,

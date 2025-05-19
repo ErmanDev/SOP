@@ -44,10 +44,17 @@ exports.getProductsByCategory = async (req, res) => {
 // Create new product
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, category, image_url, description, stock_quantity } =
-      req.body;
+    const {
+      name,
+      price,
+      category,
+      image_url,
+      description,
+      stock_quantity,
+      discount_percentage,
+    } = req.body;
 
-    // Generate product_id (you might want to use a more sophisticated method)
+    // Generate product_id
     const product_id = `PROD-${Date.now()}`;
 
     const product = await db.Products.create({
@@ -58,6 +65,7 @@ exports.createProduct = async (req, res) => {
       image_url,
       description,
       stock_quantity,
+      discount_percentage: discount_percentage || 0,
     });
 
     res.status(201).json(product);
@@ -77,6 +85,7 @@ exports.updateProduct = async (req, res) => {
       description,
       stock_quantity,
       status,
+      discount_percentage,
     } = req.body;
 
     const [updated] = await db.Products.update(
@@ -87,7 +96,8 @@ exports.updateProduct = async (req, res) => {
         image_url,
         description,
         stock_quantity,
-        status, // Ensure `status` is included in the update
+        status,
+        discount_percentage: discount_percentage || 0,
       },
       {
         where: { id: req.params.product_id },

@@ -15,27 +15,21 @@ export default function Sales() {
       id: 1,
       orderingDate: '2025-04-01',
       salesPerson: 'John Doe',
-      totalProducts: 10,
       totalItems: 50,
-      status: 'Sales Order',
       totalAmount: '$1000 (10% tax)',
     },
     {
       id: 2,
       orderingDate: '2025-04-05',
       salesPerson: 'Jane Smith',
-      totalProducts: 5,
       totalItems: 20,
-      status: 'Quotation Sent',
       totalAmount: '$500 (5% tax)',
     },
     {
       id: 3,
       orderingDate: '2025-04-10',
       salesPerson: 'Alice Johnson',
-      totalProducts: 8,
       totalItems: 40,
-      status: 'Sales Order',
       totalAmount: '$800 (8% tax)',
     },
   ];
@@ -80,13 +74,18 @@ export default function Sales() {
       <div className="border rounded-lg shadow-md p-6 bg-white">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Sales Management</h1>
-          <input
-            type="text"
-            placeholder="Search sales..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
-          />
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Search sales..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="w-80 border border-gray-300 rounded-lg px-4 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600"
+            />
+            <button className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700">
+              Create Sales
+            </button>
+          </div>
         </div>
 
         <div className="rounded-lg overflow-hidden">
@@ -103,12 +102,8 @@ export default function Sales() {
                   Sales Person
                 </TableHead>
                 <TableHead className="text-center text-white">
-                  Total Products
-                </TableHead>
-                <TableHead className="text-center text-white">
                   Total Items
                 </TableHead>
-                <TableHead className="text-center text-white">Status</TableHead>
                 <TableHead className="text-center text-white">
                   Total Amount
                 </TableHead>
@@ -126,12 +121,8 @@ export default function Sales() {
                     {sale.salesPerson}
                   </TableCell>
                   <TableCell className="text-center">
-                    {sale.totalProducts}
-                  </TableCell>
-                  <TableCell className="text-center">
                     {sale.totalItems}
                   </TableCell>
-                  <TableCell className="text-center">{sale.status}</TableCell>
                   <TableCell className="text-center">
                     {sale.totalAmount}
                   </TableCell>
@@ -198,30 +189,10 @@ export default function Sales() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium">
-                Total Products
-              </label>
-              <input
-                type="text"
-                value={selectedSale.totalProducts}
-                readOnly
-                className="w-full border rounded px-3 py-2 bg-gray-100"
-              />
-            </div>
-            <div className="mb-4">
               <label className="block text-sm font-medium">Total Items</label>
               <input
                 type="text"
                 value={selectedSale.totalItems}
-                readOnly
-                className="w-full border rounded px-3 py-2 bg-gray-100"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium">Status</label>
-              <input
-                type="text"
-                value={selectedSale.status}
                 readOnly
                 className="w-full border rounded px-3 py-2 bg-gray-100"
               />

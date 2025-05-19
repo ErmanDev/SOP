@@ -19,6 +19,8 @@ interface Product {
   stock_quantity: number;
   status: string;
   image_url: string;
+  discountId?: number;
+  discount_percentage?: number;
 }
 
 interface NewProduct {
@@ -28,6 +30,7 @@ interface NewProduct {
   image_url: string;
   description: string;
   stock_quantity: number;
+  discount_percentage?: number;
 }
 
 export default function Products() {
@@ -53,16 +56,23 @@ export default function Products() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:5000/api/products/');
+        console.log('Fetching products...');
+        const response = await fetch('http://localhost:5000/api/products');
 
         if (!response.ok) {
-          throw new Error('Failed to fetch products');
+          const errorText = await response.text();
+          console.error('Server response:', response.status, errorText);
+          throw new Error(
+            `Failed to fetch products: ${response.status} ${response.statusText}`
+          );
         }
 
         const data = await response.json();
+        console.log('Fetched products:', data);
         setProducts(data);
       } catch (err) {
         console.error('Error fetching products:', err);
+        toast.error('Failed to fetch products. Please try again later.');
         setProducts([]);
       } finally {
         setLoading(false);
@@ -287,10 +297,11 @@ export default function Products() {
           body: JSON.stringify({
             name: selectedProduct.name,
             price: selectedProduct.price,
-            category: selectedProduct.category, // Ensure category is included
+            category: selectedProduct.category,
             stock_quantity: selectedProduct.stock_quantity,
-            status: selectedProduct.status, // Ensure status is included
+            status: selectedProduct.status,
             image_url: selectedProduct.image_url,
+            discount_percentage: selectedProduct.discount_percentage || 0,
           }),
         }
       );
@@ -701,6 +712,29 @@ export default function Products() {
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={selectedProduct?.discount_percentage || 0}
+                    onChange={(e) =>
+                      setSelectedProduct((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              discount_percentage: Number(e.target.value),
+                            }
+                          : prev
+                      )
+                    }
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter discount percentage"
+                  />
                 </div>
               </div>
               <div className="flex justify-end space-x-2 mt-4">

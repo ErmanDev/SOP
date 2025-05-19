@@ -9,10 +9,12 @@ interface Product {
   image_url: string;
   stock_quantity: number;
   status?: string;
+  discount_percentage?: number;
 }
 
 interface CartItem extends Product {
   quantity: number;
+  discountedPrice?: number;
 }
 
 interface Category {
@@ -41,25 +43,38 @@ export default function Pos() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/products');
-        setProducts(response.data);
+        setError(null); // Clear any previous errors
+        const response = await axios.get('http://localhost:5000/api/products', {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-        // Update category counts dynamically
-        setCategories((prevCategories) =>
-          prevCategories.map((category) => {
-            if (category.id === 'all') {
-              return { ...category, count: response.data.length };
-            } else {
-              const count = response.data.filter(
-                (product: Product) => product.category === category.id
-              ).length;
-              return { ...category, count };
-            }
-          })
-        );
+        if (response.data) {
+          setProducts(response.data);
+          setCategories((prevCategories) =>
+            prevCategories.map((category) => {
+              if (category.id === 'all') {
+                return { ...category, count: response.data.length };
+              } else {
+                const count = response.data.filter(
+                  (product: Product) => product.category === category.id
+                ).length;
+                return { ...category, count };
+              }
+            })
+          );
+        }
       } catch (err) {
-        setError('Failed to fetch products');
-        console.error('Error fetching products:', err);
+        console.error('Error details:', err);
+        if (axios.isAxiosError(err)) {
+          setError(
+            err.response?.data?.message ||
+              'Failed to connect to the server. Please check if the backend is running.'
+          );
+        } else {
+          setError('An unexpected error occurred while fetching products');
+        }
       } finally {
         setLoading(false);
       }
@@ -74,15 +89,31 @@ export default function Pos() {
         (item) => item.product_id === product.product_id
       );
 
+      // Calculate discounted price if discount exists
+      const discountedPrice = product.discount_percentage
+        ? product.price * (1 - product.discount_percentage / 100)
+        : product.price;
+
       if (existingItem) {
         return prevCart.map((item) =>
           item.product_id === product.product_id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+                ...item,
+                quantity: item.quantity + 1,
+                discountedPrice,
+              }
             : item
         );
       }
 
-      return [...prevCart, { ...product, quantity: 1 }];
+      return [
+        ...prevCart,
+        {
+          ...product,
+          quantity: 1,
+          discountedPrice,
+        },
+      ];
     });
   };
 
@@ -102,8 +133,16 @@ export default function Pos() {
 
   const calculateSubtotal = () => {
     return cart
-      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .reduce((total, item) => {
+        const price = item.discountedPrice || item.price;
+        return total + price * item.quantity;
+      }, 0)
       .toFixed(2);
+  };
+
+  const calculateVAT = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    return (subtotal * 0.12).toFixed(2); // 12% VAT
   };
 
   // Updated calculateDiscount to include a 12% local tax for the Philippines.
@@ -111,8 +150,15 @@ export default function Pos() {
     if (!activeDiscount) return '0';
     const subtotal = parseFloat(calculateSubtotal());
     const discount = activeDiscount === 'PWD' ? 0.1 : 0.15;
-    const tax = 0.12; // 12% local tax
-    return (subtotal * discount + subtotal * tax).toFixed(2);
+    return (subtotal * discount).toFixed(2);
+  };
+
+  // Calculate final total including VAT
+  const calculateTotal = () => {
+    const subtotal = parseFloat(calculateSubtotal());
+    const discount = parseFloat(calculateDiscount());
+    const vat = parseFloat(calculateVAT());
+    return (subtotal - discount + vat).toFixed(2);
   };
 
   // Updated filteredProducts to exclude products with a status of 'Inactive'.
@@ -160,20 +206,36 @@ export default function Pos() {
         </div>
       )}
 
-      {/* Categories */}
-      <div className="flex space-x-4 mb-6">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
-            className={`px-4 py-2 rounded-lg ${
-              selectedCategory === category.id ? 'bg-pink-500' : 'bg-purple-700'
-            }`}
-          >
-            <div className="text-lg font-bold">{category.name}</div>
-            <div className="text-sm">{category.count}</div>
+      {/* Categories and Account Number Row */}
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex space-x-4">
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              onClick={() => setSelectedCategory(category.id)}
+              className={`px-4 py-2 rounded-lg ${
+                selectedCategory === category.id
+                  ? 'bg-pink-500'
+                  : 'bg-purple-700'
+              }`}
+            >
+              <div className="text-lg font-bold">{category.name}</div>
+              <div className="text-sm">{category.count}</div>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center space-x-3">
+          <label className="text-white font-semibold">Account Number:</label>
+          <input
+            type="text"
+            className="px-3 py-1 rounded-lg text-black"
+            placeholder="Enter account number"
+          />
+          <button className="px-4 py-1 rounded-lg bg-purple-700 text-white hover:bg-purple-800">
+            Check
           </button>
-        ))}
+        </div>
       </div>
 
       {/* Main Content */}
@@ -194,7 +256,26 @@ export default function Pos() {
               <div className="text-center">
                 <div className="font-bold text-lg mb-1">{product.name}</div>
                 <div className="text-sm text-gray-700 mb-1">
-                  ₱{product.price.toFixed(2)}
+                  {product.discount_percentage &&
+                  product.discount_percentage > 0 ? (
+                    <div>
+                      <span className="line-through text-gray-500">
+                        ₱{product.price.toFixed(2)}
+                      </span>
+                      <span className="text-green-600 ml-2">
+                        ₱
+                        {(
+                          product.price *
+                          (1 - product.discount_percentage / 100)
+                        ).toFixed(2)}
+                      </span>
+                      <div className="text-xs text-green-600">
+                        {product.discount_percentage}% OFF
+                      </div>
+                    </div>
+                  ) : (
+                    <span>₱{product.price.toFixed(2)}</span>
+                  )}
                 </div>
                 <div className="text-xs text-gray-500">
                   Stock: {product.stock_quantity}
@@ -222,9 +303,23 @@ export default function Pos() {
                 />
                 <div className="flex-1">
                   <div className="font-bold text-lg">{item.name}</div>
-                  <div className="text-sm text-gray-700">
-                    ₱{item.price.toFixed(2)}
-                  </div>
+                  {item.discount_percentage && item.discount_percentage > 0 ? (
+                    <div>
+                      <span className="line-through text-gray-500">
+                        ₱{item.price.toFixed(2)}
+                      </span>
+                      <span className="text-green-600 ml-2">
+                        ₱{item.discountedPrice?.toFixed(2)}
+                      </span>
+                      <div className="text-xs text-green-600">
+                        {item.discount_percentage}% OFF
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-700">
+                      ₱{item.price.toFixed(2)}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center space-x-2">
                   <input
@@ -265,15 +360,13 @@ export default function Pos() {
                 <span>-₱{calculateDiscount()}</span>
               </div>
             )}
+            <div className="flex justify-between text-red-600">
+              <span>VAT (12%):</span>
+              <span>₱{calculateVAT()}</span>
+            </div>
             <div className="flex justify-between font-bold">
               <span>Total:</span>
-              <span>
-                ₱
-                {(
-                  parseFloat(calculateSubtotal()) -
-                  parseFloat(calculateDiscount())
-                ).toFixed(2)}
-              </span>
+              <span>₱{calculateTotal()}</span>
             </div>
           </div>
           <div className="flex space-x-2 mt-2">
