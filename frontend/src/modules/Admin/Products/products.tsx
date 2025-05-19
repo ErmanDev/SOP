@@ -49,6 +49,13 @@ export default function Products() {
   });
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [categories, setCategories] = useState([
+    { id: 'all', name: 'All', count: 0 },
+    { id: 'Home Appliance', name: 'Home Appliance', count: 0 },
+    { id: 'Gadgets', name: 'Gadgets', count: 0 },
+    { id: 'Furnitures', name: 'Furnitures', count: 0 },
+    { id: 'Smart Home', name: 'Smart Home', count: 0 },
+  ]);
 
   const itemsPerPage = 5;
 
@@ -70,6 +77,24 @@ export default function Products() {
         const data = await response.json();
         console.log('Fetched products:', data);
         setProducts(data);
+
+        // Update category counts
+        setCategories((prevCategories) =>
+          prevCategories.map((category) => {
+            if (category.id === 'all') {
+              return {
+                ...category,
+                count: data.filter((p) => p.status === 'Active').length,
+              };
+            }
+            return {
+              ...category,
+              count: data.filter(
+                (p) => p.category === category.id && p.status === 'Active'
+              ).length,
+            };
+          })
+        );
       } catch (err) {
         console.error('Error fetching products:', err);
         toast.error('Failed to fetch products. Please try again later.');
@@ -312,10 +337,40 @@ export default function Products() {
 
       const updatedProduct = await response.json();
 
+      // Update products list
       setProducts((prevProducts) =>
         prevProducts.map((product) =>
           product.id === updatedProduct.id ? updatedProduct : product
         )
+      );
+
+      // Update category counts
+      setCategories((prevCategories) =>
+        prevCategories.map((category) => {
+          if (category.id === 'all') {
+            // For 'all' category, count all active products
+            const activeProductsCount = products.filter(
+              (product) =>
+                (product.id !== updatedProduct.id &&
+                  product.status === 'Active') ||
+                (product.id === updatedProduct.id &&
+                  updatedProduct.status === 'Active')
+            ).length;
+            return { ...category, count: activeProductsCount };
+          } else if (category.id === updatedProduct.category) {
+            // For the product's category, update count based on status
+            const categoryProductsCount = products.filter(
+              (product) =>
+                product.category === category.id &&
+                ((product.id !== updatedProduct.id &&
+                  product.status === 'Active') ||
+                  (product.id === updatedProduct.id &&
+                    updatedProduct.status === 'Active'))
+            ).length;
+            return { ...category, count: categoryProductsCount };
+          }
+          return category;
+        })
       );
 
       toast.success('Product updated successfully!');
@@ -354,6 +409,23 @@ export default function Products() {
               Create Product
             </button>
           </div>
+        </div>
+
+        {/* Category Count Boxes */}
+        <div className="flex space-x-4 mb-6">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="bg-purple-100 rounded-lg p-4 flex-1 text-center"
+            >
+              <div className="text-lg font-bold text-purple-800">
+                {category.name}
+              </div>
+              <div className="text-2xl font-bold text-purple-600">
+                {category.count}
+              </div>
+            </div>
+          ))}
         </div>
 
         {products.length === 0 ? (

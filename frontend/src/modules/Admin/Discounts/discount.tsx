@@ -183,20 +183,13 @@ export default function Discounts() {
   const handleSaveEditDiscount = async () => {
     if (!editDiscountId) return;
     try {
-      // Format dates to YYYY-MM-DD
-      const formatDate = (date: string) => {
-        return new Date(date).toISOString().split('T')[0];
-      };
-
       const payload = {
-        ...newDiscount,
+        name: newDiscount.name,
+        type: newDiscount.type,
         percentage: Number(newDiscount.percentage),
-        startDate: formatDate(newDiscount.startDate),
-        endDate: formatDate(newDiscount.endDate),
-        // Ensure categories is always an array
-        categories: Array.isArray(newDiscount.categories)
-          ? newDiscount.categories
-          : [newDiscount.categories],
+        startDate: new Date(newDiscount.startDate).toISOString().split('T')[0],
+        endDate: new Date(newDiscount.endDate).toISOString().split('T')[0],
+        categories: newDiscount.categories,
       };
 
       const response = await fetch(
@@ -236,6 +229,15 @@ export default function Discounts() {
       toast.success(
         updatedDiscount.message || 'Discount updated successfully!'
       );
+
+      // Refresh the discounts list
+      const refreshResponse = await fetch(
+        'http://localhost:5000/api/discounts'
+      );
+      if (refreshResponse.ok) {
+        const refreshedData = await refreshResponse.json();
+        setDiscounts(refreshedData);
+      }
     } catch (error) {
       console.error('Error updating discount:', error);
       toast.error(
@@ -597,6 +599,32 @@ export default function Discounts() {
                     placeholder="Discount Percentage"
                     className="w-full"
                   />
+                </div>
+                <div className="mb-4 col-span-2">
+                  <label
+                    htmlFor="edit-categories"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Apply to Categories
+                  </label>
+                  <select
+                    id="edit-categories"
+                    name="categories"
+                    multiple
+                    value={newDiscount.categories}
+                    onChange={handleCategoryChange}
+                    className="w-full border rounded px-2 py-1 h-32"
+                  >
+                    {availableCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Hold Ctrl/Cmd to select multiple categories. Select 'All
+                    Categories' to apply to all.
+                  </p>
                 </div>
               </div>
               <div className="flex justify-end space-x-2 mt-4">

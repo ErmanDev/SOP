@@ -431,7 +431,7 @@ export default function Pos() {
                             (1 - product.discount_percentage / 100)
                           ).toFixed(2)}
                         </span>
-                        <div className="text-xs text-green-600">
+                        <div className="text-xs text-red-600">
                           {product.discount_percentage}% OFF
                         </div>
                       </div>
@@ -483,7 +483,7 @@ export default function Pos() {
                         <span className="text-green-600 ml-2">
                           ₱{item.discountedPrice?.toFixed(2)}
                         </span>
-                        <div className="text-xs text-green-600">
+                        <div className="text-xs text-red-600">
                           {item.discount_percentage}% OFF
                         </div>
                       </div>
@@ -536,7 +536,7 @@ export default function Pos() {
                 <span>-₱{calculateDiscount()}</span>
               </div>
             )}
-            <div className="flex justify-between text-red-600">
+            <div className="flex justify-between text-green-600">
               <span>VAT (12%):</span>
               <span>₱{calculateVAT()}</span>
             </div>

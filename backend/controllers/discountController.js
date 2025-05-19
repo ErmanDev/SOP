@@ -221,11 +221,9 @@ exports.deleteDiscount = async (req, res) => {
       }
     });
 
-    res
-      .status(200)
-      .json({
-        message: 'Discount deleted and removed from all products successfully',
-      });
+    res.status(200).json({
+      message: 'Discount deleted and removed from all products successfully',
+    });
   } catch (error) {
     console.error('Error deleting discount:', error);
     res
@@ -300,9 +298,8 @@ exports.updateDiscount = async (req, res) => {
 
       // Update products with new discount values
       const whereClause = categories.includes('all')
-        ? { discountId: id }
+        ? {} // If 'all' is selected, update all products
         : {
-            discountId: id,
             category: { [Op.in]: categories },
           };
 
@@ -310,9 +307,11 @@ exports.updateDiscount = async (req, res) => {
       const currentDate = new Date();
       const isActive = currentDate >= start && currentDate <= end;
 
+      // Update all matching products with the new discount
       await Product.update(
         {
           discount_percentage: isActive ? percentage : 0,
+          discountId: id, // Add this line to ensure discountId is set
           discount_startDate: start,
           discount_endDate: end,
         },
@@ -321,6 +320,7 @@ exports.updateDiscount = async (req, res) => {
           transaction: t,
           fields: [
             'discount_percentage',
+            'discountId',
             'discount_startDate',
             'discount_endDate',
           ],
