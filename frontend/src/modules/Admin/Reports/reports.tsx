@@ -108,12 +108,21 @@ export default function Reports() {
   const renderStatCards = () => {
     switch (selectedReport) {
       case 'sales':
+        // Calculate total sales from salesData
+        const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
+        const formattedTotalSales = new Intl.NumberFormat('en-PH', {
+          style: 'currency',
+          currency: 'PHP',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }).format(totalSales);
+
         return (
           <>
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Total Sales"
-              value="₱45,231.89"
+              value={formattedTotalSales}
               trend={0}
             />
             <StatCard

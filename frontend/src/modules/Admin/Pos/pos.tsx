@@ -200,11 +200,34 @@ export default function Pos() {
     price: Number(product.price) || 0, // Convert to number or default to 0
   }));
 
-  const handlePayment = () => {
-    // Process payment logic here
-    setCart([]); // Clear cart after payment
-    setActiveDiscount(null); // Clear discount
-    setOrderNumber((prev) => prev + 1); // Increment order number
+  const handlePayment = async () => {
+    if (cart.length === 0) {
+      toast.error('Cart is empty');
+      return;
+    }
+
+    try {
+      // If there's a customer account number, update their total amount
+      if (accountNumber && accountNumber !== '0') {
+        const total = parseFloat(calculateTotal());
+        await axios.post('http://localhost:5000/api/customers/update-total', {
+          account_number: accountNumber,
+          amount: total,
+        });
+        toast.success('Customer total amount updated successfully');
+      }
+
+      // Process payment logic here
+      setCart([]); // Clear cart after payment
+      setActiveDiscount(null); // Clear discount
+      setOrderNumber((prev) => prev + 1); // Increment order number
+      setCustomerName(''); // Clear customer name
+      setAccountNumber(''); // Clear account number
+      toast.success('Payment processed successfully');
+    } catch (error) {
+      console.error('Error processing payment:', error);
+      toast.error('Failed to process payment');
+    }
   };
 
   const handleAccountNumberChange = async (

@@ -103,6 +103,27 @@ const CustomerController = {
       res.status(500).json({ message: err.message });
     }
   },
+
+  async updateTotalAmount(req, res) {
+    try {
+      const { account_number, amount } = req.body;
+      const customer = await Customer.findOne({ where: { account_number } });
+
+      if (!customer) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+
+      // Convert existing totalAmount to number, handle null/undefined case
+      const currentTotal = parseFloat(customer.totalAmount || '0');
+      const newTotal = (currentTotal + parseFloat(amount)).toFixed(2);
+
+      await customer.update({ totalAmount: newTotal });
+      res.json(customer);
+    } catch (err) {
+      console.error('Error updating customer total amount:', err);
+      res.status(500).json({ message: err.message });
+    }
+  },
 };
 
 module.exports = CustomerController;
