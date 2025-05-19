@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-import { Button } from '../../../components/ui/button';
 import { Input } from '../../../components/ui/input';
 import { Table } from '../../../components/ui/table';
 import {
@@ -22,22 +21,33 @@ interface Discount {
   startDate: string;
   endDate: string;
   percentage: number;
+  categories: string[];
 }
 
 export default function Discounts() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [newDiscount, setNewDiscount] = useState({
     name: '',
-    type: 'occasional', // Default type
+    type: 'occasional',
     startDate: '',
     endDate: '',
-    percentage: 0, // Default percentage
+    percentage: 0,
+    categories: ['all'] as string[],
   });
   const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editDiscountId, setEditDiscountId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<number | null>(null);
+
+  // Add available categories
+  const availableCategories = [
+    { id: 'all', name: 'All Categories' },
+    { id: 'Home Appliance', name: 'Home Appliance' },
+    { id: 'Gadgets', name: 'Gadgets' },
+    { id: 'Furnitures', name: 'Furnitures' },
+    { id: 'Smart Home', name: 'Smart Home' },
+  ];
 
   useEffect(() => {
     const fetchDiscounts = async () => {
@@ -67,6 +77,17 @@ export default function Discounts() {
     setNewDiscount((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setNewDiscount((prev) => ({
+      ...prev,
+      categories: selectedOptions,
+    }));
+  };
+
   const handleCreateDiscount = async () => {
     if (
       !newDiscount.name ||
@@ -74,7 +95,8 @@ export default function Discounts() {
       !newDiscount.startDate ||
       !newDiscount.endDate ||
       newDiscount.percentage === null ||
-      newDiscount.percentage === undefined
+      newDiscount.percentage === undefined ||
+      !newDiscount.categories.length
     ) {
       toast.error('Please fill in all fields');
       return;
@@ -83,7 +105,9 @@ export default function Discounts() {
     try {
       const payload = {
         ...newDiscount,
-        percentage: Number(newDiscount.percentage), // Ensure percentage is a number
+        percentage: Number(newDiscount.percentage),
+        startDate: new Date(newDiscount.startDate).toISOString(),
+        endDate: new Date(newDiscount.endDate).toISOString(),
       };
 
       const response = await fetch(
@@ -97,26 +121,39 @@ export default function Discounts() {
         }
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorMessage = await response.text(); // or response.json() if it returns JSON
-        console.error('Failed to create discount:', errorMessage);
-        throw new Error('Failed to create discount');
+        throw new Error(
+          data.error || data.message || 'Failed to create discount'
+        );
       }
 
-      const createdDiscount = await response.json();
-      setDiscounts((prev) => [createdDiscount, ...prev]);
+      setDiscounts((prev) => [data.discount, ...prev]);
       setNewDiscount({
         name: '',
         type: 'occasional',
         startDate: '',
         endDate: '',
         percentage: 0,
+        categories: ['all'],
       });
       setIsAdding(false);
-      toast.success('Discount created successfully!');
+
+      toast.success(data.message || 'Discount created successfully!');
+
+      const refreshResponse = await fetch(
+        'http://localhost:5000/api/discounts'
+      );
+      if (refreshResponse.ok) {
+        const refreshedData = await refreshResponse.json();
+        setDiscounts(refreshedData);
+      }
     } catch (error) {
       console.error('Error creating discount:', error);
-      toast.error('Failed to create discount');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to create discount'
+      );
     }
   };
 
@@ -125,12 +162,18 @@ export default function Discounts() {
       (discount) => discount.id === discountId
     );
     if (discountToEdit) {
+      // Format dates to YYYY-MM-DD
+      const formatDate = (date: string) => {
+        return new Date(date).toISOString().split('T')[0];
+      };
+
       setNewDiscount({
         name: discountToEdit.name,
         type: discountToEdit.type,
-        startDate: discountToEdit.startDate,
-        endDate: discountToEdit.endDate,
+        startDate: formatDate(discountToEdit.startDate),
+        endDate: formatDate(discountToEdit.endDate),
         percentage: discountToEdit.percentage,
+        categories: discountToEdit.categories || ['all'],
       });
       setEditDiscountId(discountId);
       setIsEditing(true);
@@ -140,10 +183,22 @@ export default function Discounts() {
   const handleSaveEditDiscount = async () => {
     if (!editDiscountId) return;
     try {
+      // Format dates to YYYY-MM-DD
+      const formatDate = (date: string) => {
+        return new Date(date).toISOString().split('T')[0];
+      };
+
       const payload = {
         ...newDiscount,
         percentage: Number(newDiscount.percentage),
+        startDate: formatDate(newDiscount.startDate),
+        endDate: formatDate(newDiscount.endDate),
+        // Ensure categories is always an array
+        categories: Array.isArray(newDiscount.categories)
+          ? newDiscount.categories
+          : [newDiscount.categories],
       };
+
       const response = await fetch(
         `http://localhost:5000/api/discounts/${editDiscountId}`,
         {
@@ -154,16 +209,19 @@ export default function Discounts() {
           body: JSON.stringify(payload),
         }
       );
+
       if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || 'Failed to update discount');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update discount');
       }
+
       const updatedDiscount = await response.json();
       setDiscounts((prev) =>
         prev.map((discount) =>
-          discount.id === editDiscountId ? updatedDiscount : discount
+          discount.id === editDiscountId ? updatedDiscount.discount : discount
         )
       );
+
       setIsEditing(false);
       setEditDiscountId(null);
       setNewDiscount({
@@ -172,11 +230,17 @@ export default function Discounts() {
         startDate: '',
         endDate: '',
         percentage: 0,
+        categories: ['all'],
       });
-      toast.success('Discount updated successfully!');
+
+      toast.success(
+        updatedDiscount.message || 'Discount updated successfully!'
+      );
     } catch (error) {
       console.error('Error updating discount:', error);
-      toast.error('Failed to update discount');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to update discount'
+      );
     }
   };
 
@@ -397,6 +461,32 @@ export default function Discounts() {
                     className="w-full"
                   />
                 </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="categories"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Apply to Categories
+                  </label>
+                  <select
+                    id="categories"
+                    name="categories"
+                    multiple
+                    value={newDiscount.categories}
+                    onChange={handleCategoryChange}
+                    className="w-full border rounded px-2 py-1 h-32"
+                  >
+                    {availableCategories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Hold Ctrl/Cmd to select multiple categories. Select 'All
+                    Categories' to apply to all.
+                  </p>
+                </div>
               </div>
               <div className="flex justify-end space-x-2 mt-4">
                 <button
@@ -529,6 +619,7 @@ export default function Discounts() {
                       startDate: '',
                       endDate: '',
                       percentage: 0,
+                      categories: ['all'],
                     });
                   }}
                 >

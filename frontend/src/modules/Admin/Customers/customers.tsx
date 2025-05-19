@@ -484,19 +484,6 @@ export default function Customer() {
                 </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium">
-                    Total Amount
-                  </label>
-                  <input
-                    type="text"
-                    name="totalAmount"
-                    value={newCustomer.totalAmount}
-                    onChange={handleNewCustomerChange}
-                    required
-                    className="w-full border rounded px-3 py-2"
-                  />
-                </div>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium">
                     Membership
                   </label>
                   <select
@@ -656,11 +643,8 @@ export default function Customer() {
                     type="text"
                     name="totalAmount"
                     value={selectedCustomer.totalAmount}
-                    onChange={handleInputChange}
-                    readOnly={!isEditing}
-                    className={`w-full border rounded px-3 py-2 ${
-                      isEditing ? '' : 'bg-gray-100'
-                    }`}
+                    readOnly
+                    className="w-full border rounded px-3 py-2 bg-gray-100"
                   />
                 </div>
                 <div className="mb-4">

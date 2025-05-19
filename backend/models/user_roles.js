@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, Sequelize) => {
   const UserRoles = sequelize.define(
     'UserRoles',

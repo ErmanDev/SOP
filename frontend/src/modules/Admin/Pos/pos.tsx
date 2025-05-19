@@ -22,6 +22,8 @@ interface Product {
   stock_quantity: number;
   status?: string;
   discount_percentage?: number;
+  discount_startDate?: string;
+  discount_endDate?: string;
 }
 
 interface CartItem extends Product {
@@ -66,44 +68,68 @@ export default function Pos() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        setError(null); // Clear any previous errors
-        const response = await axios.get('http://localhost:5000/api/products', {
+        setError(null);
+        const response = await fetch('http://localhost:5000/api/products', {
           headers: {
             'Content-Type': 'application/json',
           },
+          // Add cache control to prevent caching
+          cache: 'no-store',
         });
 
-        if (response.data) {
-          setProducts(response.data);
-          setCategories((prevCategories) =>
-            prevCategories.map((category) => {
-              if (category.id === 'all') {
-                return { ...category, count: response.data.length };
-              } else {
-                const count = response.data.filter(
-                  (product: Product) => product.category === category.id
-                ).length;
-                return { ...category, count };
-              }
-            })
-          );
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
         }
+
+        const data = await response.json();
+
+        // Process products to ensure proper number formatting
+        const processedProducts = data.map((product) => ({
+          ...product,
+          price: Number(product.price),
+          discount_percentage: Number(product.discount_percentage || 0),
+          discount_startDate: product.discount_startDate
+            ? new Date(product.discount_startDate)
+            : null,
+          discount_endDate: product.discount_endDate
+            ? new Date(product.discount_endDate)
+            : null,
+        }));
+
+        setProducts(processedProducts);
+
+        // Update category counts
+        setCategories((prevCategories) =>
+          prevCategories.map((category) => {
+            if (category.id === 'all') {
+              return { ...category, count: processedProducts.length };
+            } else {
+              const count = processedProducts.filter(
+                (product) =>
+                  product.category === category.id &&
+                  product.status !== 'Inactive'
+              ).length;
+              return { ...category, count };
+            }
+          })
+        );
       } catch (err) {
-        console.error('Error details:', err);
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message ||
-              'Failed to connect to the server. Please check if the backend is running.'
-          );
-        } else {
-          setError('An unexpected error occurred while fetching products');
-        }
+        console.error('Error fetching products:', err);
+        setError(
+          err instanceof Error ? err.message : 'Failed to fetch products'
+        );
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
+
+    // Set up periodic refresh (every 30 seconds)
+    const refreshInterval = setInterval(fetchProducts, 30000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(refreshInterval);
   }, []);
 
   const handleAddToCart = (product: Product) => {
@@ -112,10 +138,20 @@ export default function Pos() {
         (item) => item.product_id === product.product_id
       );
 
-      // Calculate discounted price if discount exists
-      const discountedPrice = product.discount_percentage
-        ? product.price * (1 - product.discount_percentage / 100)
-        : product.price;
+      // Calculate discounted price if discount exists and is active
+      const currentDate = new Date();
+      const isDiscountActive =
+        product.discount_percentage !== undefined &&
+        product.discount_percentage > 0 &&
+        product.discount_startDate &&
+        product.discount_endDate &&
+        new Date(product.discount_startDate) <= currentDate &&
+        new Date(product.discount_endDate) >= currentDate;
+
+      const discountedPrice =
+        isDiscountActive && product.discount_percentage
+          ? product.price * (1 - product.discount_percentage / 100)
+          : product.price;
 
       if (existingItem) {
         return prevCart.map((item) =>
@@ -124,6 +160,11 @@ export default function Pos() {
                 ...item,
                 quantity: item.quantity + 1,
                 discountedPrice,
+                discount_percentage: isDiscountActive
+                  ? product.discount_percentage
+                  : 0,
+                discount_startDate: product.discount_startDate,
+                discount_endDate: product.discount_endDate,
               }
             : item
         );
@@ -135,6 +176,11 @@ export default function Pos() {
           ...product,
           quantity: 1,
           discountedPrice,
+          discount_percentage: isDiscountActive
+            ? product.discount_percentage
+            : 0,
+          discount_startDate: product.discount_startDate,
+          discount_endDate: product.discount_endDate,
         },
       ];
     });
@@ -350,50 +396,59 @@ export default function Pos() {
       <div className="grid grid-cols-3 gap-4">
         {/* Products */}
         <div className="col-span-2 grid grid-cols-4 gap-4">
-          {sanitizedProducts.map((product) => (
-            <div
-              key={product.product_id}
-              className="bg-white text-black rounded-lg shadow-md p-4 flex flex-col items-center justify-between cursor-pointer hover:shadow-lg w-48 h-64"
-              onClick={() => handleAddToCart(product)}
-            >
-              <img
-                src={product.image_url}
-                alt={product.name}
-                className="h-24 w-24 mb-4 object-cover rounded-full border border-gray-300"
-              />
-              <div className="text-center">
-                <div className="font-bold text-lg mb-1">{product.name}</div>
-                <div className="text-sm text-gray-700 mb-1">
-                  {product.discount_percentage &&
-                  product.discount_percentage > 0 ? (
-                    <div>
-                      <span className="line-through text-gray-500">
-                        ₱{product.price.toFixed(2)}
-                      </span>
-                      <span className="text-green-600 ml-2">
-                        ₱
-                        {(
-                          product.price *
-                          (1 - product.discount_percentage / 100)
-                        ).toFixed(2)}
-                      </span>
-                      <div className="text-xs text-green-600">
-                        {product.discount_percentage}% OFF
+          {sanitizedProducts.map((product) => {
+            const currentDate = new Date();
+            const isDiscountActive =
+              product.discount_percentage &&
+              product.discount_startDate &&
+              product.discount_endDate &&
+              new Date(product.discount_startDate) <= currentDate &&
+              new Date(product.discount_endDate) >= currentDate;
+
+            return (
+              <div
+                key={product.product_id}
+                className="bg-white text-black rounded-lg shadow-md p-4 flex flex-col items-center justify-between cursor-pointer hover:shadow-lg w-48 h-64"
+                onClick={() => handleAddToCart(product)}
+              >
+                <img
+                  src={product.image_url}
+                  alt={product.name}
+                  className="h-24 w-24 mb-4 object-cover rounded-full border border-gray-300"
+                />
+                <div className="text-center">
+                  <div className="font-bold text-lg mb-1">{product.name}</div>
+                  <div className="text-sm text-gray-700 mb-1">
+                    {isDiscountActive ? (
+                      <div>
+                        <span className="line-through text-gray-500">
+                          ₱{product.price.toFixed(2)}
+                        </span>
+                        <span className="text-green-600 ml-2">
+                          ₱
+                          {(
+                            product.price *
+                            (1 - product.discount_percentage / 100)
+                          ).toFixed(2)}
+                        </span>
+                        <div className="text-xs text-green-600">
+                          {product.discount_percentage}% OFF
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <span>₱{product.price.toFixed(2)}</span>
-                  )}
+                    ) : (
+                      <span>₱{product.price.toFixed(2)}</span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    Stock: {product.stock_quantity}
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500">
-                  Stock: {product.stock_quantity}
-                </div>
+                <button className="mt-2 bg-purple-600 text-white py-1 px-3 rounded-lg hover:bg-purple-700">
+                  Add to Cart
+                </button>
               </div>
-              <button className="mt-2 bg-purple-600 text-white py-1 px-3 rounded-lg hover:bg-purple-700">
-                Add to Cart
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Cart */}
@@ -402,52 +457,65 @@ export default function Pos() {
             Order No: {orderNumber.toString().padStart(6, '0')}
           </h2>
           <div className="space-y-4 max-h-64 overflow-y-auto h-64">
-            {cart.map((item, index) => (
-              <div key={index} className="flex items-center space-x-4">
-                <img
-                  src={item.image_url}
-                  alt={item.name}
-                  className="w-16 h-16 object-cover rounded-md border border-gray-300"
-                />
-                <div className="flex-1">
-                  <div className="font-bold text-lg">{item.name}</div>
-                  {item.discount_percentage && item.discount_percentage > 0 ? (
-                    <div>
-                      <span className="line-through text-gray-500">
-                        ₱{item.price.toFixed(2)}
-                      </span>
-                      <span className="text-green-600 ml-2">
-                        ₱{item.discountedPrice?.toFixed(2)}
-                      </span>
-                      <div className="text-xs text-green-600">
-                        {item.discount_percentage}% OFF
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="text-sm text-gray-700">
-                      ₱{item.price.toFixed(2)}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      handleQuantityChange(index, parseInt(e.target.value) || 1)
-                    }
-                    className="w-16 border rounded text-center"
+            {cart.map((item, index) => {
+              const currentDate = new Date();
+              const isDiscountActive =
+                item.discount_percentage &&
+                item.discount_startDate &&
+                item.discount_endDate &&
+                new Date(item.discount_startDate) <= currentDate &&
+                new Date(item.discount_endDate) >= currentDate;
+
+              return (
+                <div key={index} className="flex items-center space-x-4">
+                  <img
+                    src={item.image_url}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded-md border border-gray-300"
                   />
-                  <button
-                    onClick={() => handleRemoveFromCart(index)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 size={20} />
-                  </button>
+                  <div className="flex-1">
+                    <div className="font-bold text-lg">{item.name}</div>
+                    {isDiscountActive ? (
+                      <div>
+                        <span className="line-through text-gray-500">
+                          ₱{item.price.toFixed(2)}
+                        </span>
+                        <span className="text-green-600 ml-2">
+                          ₱{item.discountedPrice?.toFixed(2)}
+                        </span>
+                        <div className="text-xs text-green-600">
+                          {item.discount_percentage}% OFF
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-700">
+                        ₱{item.price.toFixed(2)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleQuantityChange(
+                          index,
+                          parseInt(e.target.value) || 1
+                        )
+                      }
+                      className="w-16 border rounded text-center"
+                    />
+                    <button
+                      onClick={() => handleRemoveFromCart(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="mt-4 border-t pt-4">
             <div className="flex justify-between">
