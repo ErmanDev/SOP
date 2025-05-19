@@ -127,9 +127,21 @@ export default function Payroll() {
   ) => {
     const { name, value } = e.target;
     if (isEditing && selectedPayroll) {
-      setSelectedPayroll({ ...selectedPayroll, [name]: value });
+      if (name !== 'status') {
+        setSelectedPayroll({ ...selectedPayroll, [name]: value });
+      }
     } else {
       setNewPayroll({ ...newPayroll, [name]: value });
+
+      if (name === 'employeeId') {
+        const selectedEmployee = employees.find((emp) => emp.id === value);
+        if (selectedEmployee) {
+          setNewPayroll((prev) => ({
+            ...prev,
+            [name]: value,
+          }));
+        }
+      }
     }
   };
 
@@ -449,6 +461,20 @@ export default function Payroll() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <input
+                  type="text"
+                  value={
+                    employees.find((emp) => emp.id === newPayroll.employeeId)
+                      ?.status || ''
+                  }
+                  readOnly
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
                   Position
                 </label>
                 <select
@@ -521,11 +547,26 @@ export default function Payroll() {
                   type="text"
                   name="name"
                   value={selectedPayroll.name}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
+                  readOnly
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-100"
                 />
               </div>
-              <div className="mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Status
+                </label>
+                <input
+                  type="text"
+                  name="status"
+                  value={
+                    employees.find((emp) => emp.name === selectedPayroll.name)
+                      ?.status || selectedPayroll.status
+                  }
+                  readOnly
+                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 bg-gray-100"
+                />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">
                   Position
                 </label>
@@ -543,20 +584,6 @@ export default function Payroll() {
                       {position}
                     </option>
                   ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Status
-                </label>
-                <select
-                  name="status"
-                  value={selectedPayroll.status}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                >
-                  <option value="Full-Time">Full-Time</option>
-                  <option value="Part-Time">Part-Time</option>
                 </select>
               </div>
               <div>

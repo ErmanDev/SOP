@@ -42,6 +42,14 @@ interface NewEmployee {
   profile_url: string;
 }
 
+interface PayrollEntry {
+  id: string;
+  name: string;
+  position: string;
+  status: string;
+  salary: number;
+}
+
 const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString);
@@ -262,6 +270,45 @@ export default function Employees() {
             : emp
         )
       );
+
+      // Update the corresponding payroll entry
+      try {
+        // First, fetch all payrolls to find the one matching this employee
+        const payrollResponse = await fetch(
+          'http://localhost:5000/api/payrolls'
+        );
+        const payrollData = await payrollResponse.json();
+
+        // Find the payroll entry for this employee
+        const employeePayroll = payrollData.find(
+          (payroll: PayrollEntry) => payroll.name === selectedEmployee.name
+        );
+
+        if (employeePayroll) {
+          // Update the payroll entry with the new status
+          const updatePayrollResponse = await fetch(
+            `http://localhost:5000/api/payrolls/${employeePayroll.id}`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                ...employeePayroll,
+                status: selectedEmployee.status,
+              }),
+            }
+          );
+
+          if (!updatePayrollResponse.ok) {
+            console.error('Failed to update payroll status');
+            toast.error('Employee updated but failed to update payroll status');
+          }
+        }
+      } catch (payrollError) {
+        console.error('Error updating payroll:', payrollError);
+        toast.error('Employee updated but failed to update payroll status');
+      }
 
       toast.success('Employee updated successfully');
       handleClose();
