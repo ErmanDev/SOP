@@ -27,7 +27,7 @@ db.UserRoles = require('./user_roles')(sequelize, Sequelize);
 db.Users = require('./users')(sequelize, Sequelize);
 db.Discount = require('./discount')(sequelize, Sequelize); // Import Discount first
 db.Products = require('./products')(sequelize, Sequelize); // Import Products after Discount
-
+db.Payroll = require('./payroll')(sequelize, Sequelize);
 // Initialize associations
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {

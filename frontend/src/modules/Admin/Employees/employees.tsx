@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { EyeIcon, Plus } from 'lucide-react';
+import { EyeIcon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -334,35 +334,54 @@ export default function Employees() {
 
   const handleSaveNewEmployee = async () => {
     try {
-      const formData = new FormData();
-      formData.append('user_id', newEmployee.user_id);
-      formData.append('full_name', newEmployee.full_name);
-      formData.append('email', newEmployee.email);
-      formData.append('phone', newEmployee.phone);
-      formData.append('password', newEmployee.password);
-      formData.append('status', newEmployee.status);
+      // Create the registration data object
+      const registrationData = {
+        user_id: newEmployee.user_id,
+        full_name: newEmployee.full_name,
+        email: newEmployee.email,
+        phone: newEmployee.phone,
+        password: newEmployee.password,
+        status: newEmployee.status,
+        role_id: '2', // Assuming 2 is for employees
+        profile_url: previewUrl || '',
+      };
 
-      // If a file was selected, append it to FormData
-      if (previewUrl) {
-        const fileInput = document.querySelector(
-          'input[type="file"]'
-        ) as HTMLInputElement;
-        if (fileInput?.files?.[0]) {
-          formData.append('profile_image', fileInput.files[0]);
-        }
-      }
-
-      const response = await fetch(
-        'http://localhost:5000/api/users/registerEmployee',
-        {
-          method: 'POST',
-          body: formData,
-        }
-      );
+      // Register the employee
+      const response = await fetch('http://localhost:5000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to add employee');
+      }
+
+      // Create a payroll entry for the new employee
+      const payrollData = {
+        name: newEmployee.full_name,
+        position: 'New Employee',
+        status: newEmployee.status,
+        salary: 0,
+      };
+
+      const payrollResponse = await fetch(
+        'http://localhost:5000/api/payrolls',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payrollData),
+        }
+      );
+
+      if (!payrollResponse.ok) {
+        console.error('Failed to create payroll entry');
+        toast.error('Employee registered but failed to create payroll entry');
       }
 
       // Refresh the employee list after adding a new employee
