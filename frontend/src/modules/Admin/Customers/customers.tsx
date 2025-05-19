@@ -12,10 +12,11 @@ import { toast } from 'sonner';
 
 interface Customer {
   id: number;
+  account_number: string;
   name: string;
   email: string;
   phone: string;
-  totalAmount: string;
+  totalAmount?: string;
   membership: 'Silver' | 'Gold' | 'Platinum';
   dateOfPurchase: string;
   image_url: string;
@@ -29,10 +30,11 @@ export default function Customer() {
   const [isAdding, setIsAdding] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [newCustomer, setNewCustomer] = useState<Omit<Customer, 'id'>>({
+    account_number: '',
     name: '',
     email: '',
     phone: '',
-    totalAmount: '',
+    totalAmount: '0',
     membership: 'Silver',
     dateOfPurchase: new Date().toISOString().split('T')[0],
     image_url: '',
@@ -64,10 +66,11 @@ export default function Customer() {
   const handleAddCustomer = () => {
     setIsAdding(true);
     setNewCustomer({
+      account_number: '',
       name: '',
       email: '',
       phone: '',
-      totalAmount: '',
+      totalAmount: '0',
       membership: 'Silver',
       dateOfPurchase: new Date().toISOString().split('T')[0],
       image_url: '',
@@ -120,6 +123,12 @@ export default function Customer() {
   };
 
   const handleSaveNewCustomer = async () => {
+    // Validate required fields
+    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
     try {
       const response = await fetch(
         'http://localhost:5000/api/customers/create',
@@ -128,12 +137,17 @@ export default function Customer() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(newCustomer),
+          body: JSON.stringify({
+            ...newCustomer,
+            account_number: newCustomer.account_number || `CUST-${Date.now()}`,
+            totalAmount: newCustomer.totalAmount || '0',
+          }),
         }
       );
 
       if (!response.ok) {
-        throw new Error('Failed to create customer');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create customer');
       }
 
       const savedCustomer = await response.json();
@@ -142,7 +156,9 @@ export default function Customer() {
       toast.success('Customer created successfully');
     } catch (error) {
       console.error('Error creating customer:', error);
-      toast.error('Failed to create customer');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to create customer'
+      );
     }
   };
 
@@ -297,6 +313,9 @@ export default function Customer() {
               <TableRow>
                 <TableHead className="text-center text-white">ID</TableHead>
                 <TableHead className="text-center text-white">Image</TableHead>
+                <TableHead className="text-center text-white">
+                  Account Number
+                </TableHead>
                 <TableHead className="text-center text-white">Name</TableHead>
                 <TableHead className="text-center text-white">Email</TableHead>
                 <TableHead className="text-center text-white">Phone</TableHead>
@@ -325,6 +344,9 @@ export default function Customer() {
                       className="w-10 h-10 rounded-full object-cover mx-auto"
                     />
                   </TableCell>
+                  <TableCell className="text-center">
+                    {customer.account_number}
+                  </TableCell>
                   <TableCell className="text-center">{customer.name}</TableCell>
                   <TableCell className="text-center">
                     {customer.email}
@@ -333,7 +355,7 @@ export default function Customer() {
                     {customer.phone}
                   </TableCell>
                   <TableCell className="text-center">
-                    {customer.totalAmount}
+                    {customer.totalAmount || '0'}
                   </TableCell>
                   <TableCell className="text-center">
                     <span
@@ -413,6 +435,20 @@ export default function Customer() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    name="account_number"
+                    value={newCustomer.account_number}
+                    onChange={handleNewCustomerChange}
+                    required
+                    className="w-full border rounded px-3 py-2"
+                    placeholder="Enter account number"
+                  />
+                </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium">Name</label>
                   <input
@@ -546,6 +582,21 @@ export default function Customer() {
                 )}
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    name="account_number"
+                    value={selectedCustomer.account_number}
+                    onChange={handleInputChange}
+                    readOnly={!isEditing}
+                    className={`w-full border rounded px-3 py-2 ${
+                      isEditing ? '' : 'bg-gray-100'
+                    }`}
+                  />
+                </div>
                 <div className="mb-4">
                   <label className="block text-sm font-medium">
                     Customer ID

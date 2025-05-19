@@ -1,5 +1,17 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 interface Product {
   product_id: string;
@@ -23,6 +35,12 @@ interface Category {
   count: number;
 }
 
+interface Customer {
+  id: number;
+  account_number: string;
+  name: string;
+}
+
 export default function Pos() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,6 +56,11 @@ export default function Pos() {
     { id: 'Furnitures', name: 'Furnitures', count: 0 },
     { id: 'Smart Home', name: 'Smart Home', count: 0 },
   ]);
+  const [accountNumber, setAccountNumber] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [showCustomerDialog, setShowCustomerDialog] = useState(false);
+  const [showNameInput, setShowNameInput] = useState(false);
+  const [foundCustomer, setFoundCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -184,6 +207,54 @@ export default function Pos() {
     setOrderNumber((prev) => prev + 1); // Increment order number
   };
 
+  const handleAccountNumberChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    setAccountNumber(value);
+  };
+
+  const handleCheckAccount = async () => {
+    if (!accountNumber) {
+      toast.error('Please enter an account number');
+      return;
+    }
+
+    // Special case for "0" - allow manual name input
+    if (accountNumber === '0') {
+      setShowNameInput(true);
+      return;
+    }
+
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/customers/check/${accountNumber}`
+      );
+      if (response.data) {
+        setFoundCustomer(response.data);
+        setShowCustomerDialog(true);
+      }
+    } catch {
+      toast.error('Account number does not exist');
+    }
+  };
+
+  const handleConfirmCustomer = () => {
+    if (foundCustomer) {
+      setCustomerName(foundCustomer.name);
+      setShowCustomerDialog(false);
+      toast.success(`Customer ${foundCustomer.name} selected`);
+    }
+  };
+
+  const handleManualNameSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (customerName) {
+      setShowNameInput(false);
+      toast.success(`Customer name set to ${customerName}`);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-4 bg-gradient-to-br from-purple-600 to-blue-500 min-h-screen text-white flex items-center justify-center">
@@ -229,14 +300,28 @@ export default function Pos() {
           <label className="text-white font-semibold">Account Number:</label>
           <input
             type="text"
+            value={accountNumber}
+            onChange={handleAccountNumberChange}
             className="px-3 py-1 rounded-lg text-black"
             placeholder="Enter account number"
           />
-          <button className="px-4 py-1 rounded-lg bg-purple-700 text-white hover:bg-purple-800">
+          <button
+            onClick={handleCheckAccount}
+            className="px-4 py-1 rounded-lg bg-purple-700 text-white hover:bg-purple-800"
+          >
             Check
           </button>
         </div>
       </div>
+
+      {/* Customer Name Display */}
+      {customerName && (
+        <div className="mb-4 text-right">
+          <span className="bg-purple-700 px-4 py-2 rounded-lg">
+            Customer: {customerName}
+          </span>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="grid grid-cols-3 gap-4">
@@ -333,9 +418,9 @@ export default function Pos() {
                   />
                   <button
                     onClick={() => handleRemoveFromCart(index)}
-                    className="text-red-500 hover:underline"
+                    className="text-red-500 hover:text-red-700"
                   >
-                    Remove
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>
@@ -401,6 +486,62 @@ export default function Pos() {
           </button>
         </div>
       </div>
+
+      {/* Customer Dialog */}
+      {showCustomerDialog && foundCustomer && (
+        <AlertDialog
+          open={showCustomerDialog}
+          onOpenChange={setShowCustomerDialog}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Make Customer</AlertDialogTitle>
+              <AlertDialogDescription>
+                Customer found: {foundCustomer.name}
+                <br />
+                Would you like to proceed with this customer?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setShowCustomerDialog(false)}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmCustomer}>
+                Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {/* Manual Name Input Dialog */}
+      {showNameInput && (
+        <AlertDialog open={showNameInput} onOpenChange={setShowNameInput}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Enter Customer Name</AlertDialogTitle>
+              <AlertDialogDescription>
+                <form onSubmit={handleManualNameSubmit} className="mt-4">
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg text-black border"
+                    placeholder="Enter customer name"
+                    required
+                  />
+                  <div className="flex justify-end space-x-2 mt-4">
+                    <AlertDialogCancel onClick={() => setShowNameInput(false)}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction type="submit">Confirm</AlertDialogAction>
+                  </div>
+                </form>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 }

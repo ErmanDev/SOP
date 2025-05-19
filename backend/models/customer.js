@@ -1,3 +1,5 @@
+'use strict';
+
 const { DataTypes } = require('sequelize');
 const sequelize = require('./main').sequelize;
 
@@ -8,6 +10,11 @@ const Customer = sequelize.define(
       type: DataTypes.INTEGER,
       autoIncrement: true,
       primaryKey: true,
+    },
+    account_number: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
     },
     name: {
       type: DataTypes.STRING,
@@ -23,7 +30,8 @@ const Customer = sequelize.define(
     },
     totalAmount: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: '0',
     },
     membership: {
       type: DataTypes.ENUM('Silver', 'Gold', 'Platinum'),
@@ -33,6 +41,10 @@ const Customer = sequelize.define(
     dateOfPurchase: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    image_url: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
