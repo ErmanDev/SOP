@@ -64,71 +64,62 @@ export default function Pos() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [foundCustomer, setFoundCustomer] = useState<Customer | null>(null);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch('http://localhost:5000/api/products', {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          // Add cache control to prevent caching
-          cache: 'no-store',
-        });
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('http://localhost:5000/api/products', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+      });
 
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-
-        const data = await response.json();
-
-        // Process products to ensure proper number formatting
-        const processedProducts = data.map((product) => ({
-          ...product,
-          price: Number(product.price),
-          discount_percentage: Number(product.discount_percentage || 0),
-          discount_startDate: product.discount_startDate
-            ? new Date(product.discount_startDate)
-            : null,
-          discount_endDate: product.discount_endDate
-            ? new Date(product.discount_endDate)
-            : null,
-        }));
-
-        setProducts(processedProducts);
-
-        // Update category counts
-        setCategories((prevCategories) =>
-          prevCategories.map((category) => {
-            if (category.id === 'all') {
-              return { ...category, count: processedProducts.length };
-            } else {
-              const count = processedProducts.filter(
-                (product) =>
-                  product.category === category.id &&
-                  product.status !== 'Inactive'
-              ).length;
-              return { ...category, count };
-            }
-          })
-        );
-      } catch (err) {
-        console.error('Error fetching products:', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to fetch products'
-        );
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
       }
-    };
 
+      const data = await response.json();
+
+      const processedProducts = data.map((product: Product) => ({
+        ...product,
+        price: Number(product.price),
+        discount_percentage: Number(product.discount_percentage || 0),
+        discount_startDate: product.discount_startDate
+          ? new Date(product.discount_startDate)
+          : null,
+        discount_endDate: product.discount_endDate
+          ? new Date(product.discount_endDate)
+          : null,
+      }));
+
+      setProducts(processedProducts);
+
+      setCategories((prevCategories) =>
+        prevCategories.map((category) => {
+          if (category.id === 'all') {
+            return { ...category, count: processedProducts.length };
+          } else {
+            const count = processedProducts.filter(
+              (product: Product) =>
+                product.category === category.id &&
+                product.status !== 'Inactive'
+            ).length;
+            return { ...category, count };
+          }
+        })
+      );
+    } catch (err) {
+      console.error('Error fetching products:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch products');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProducts();
-
-    // Set up periodic refresh (every 30 seconds)
     const refreshInterval = setInterval(fetchProducts, 30000);
-
-    // Cleanup interval on component unmount
     return () => clearInterval(refreshInterval);
   }, []);
 
@@ -141,17 +132,15 @@ export default function Pos() {
       // Calculate discounted price if discount exists and is active
       const currentDate = new Date();
       const isDiscountActive =
-        product.discount_percentage !== undefined &&
-        product.discount_percentage > 0 &&
+        typeof product.discount_percentage === 'number' &&
         product.discount_startDate &&
         product.discount_endDate &&
         new Date(product.discount_startDate) <= currentDate &&
         new Date(product.discount_endDate) >= currentDate;
 
-      const discountedPrice =
-        isDiscountActive && product.discount_percentage
-          ? product.price * (1 - product.discount_percentage / 100)
-          : product.price;
+      const discountedPrice = isDiscountActive
+        ? product.price * (1 - (product.discount_percentage || 0) / 100)
+        : product.price;
 
       if (existingItem) {
         return prevCart.map((item) =>
@@ -252,18 +241,106 @@ export default function Pos() {
       return;
     }
 
+    // Check for customer name in all cases
+    if (!customerName.trim()) {
+      toast.error('Please enter customer name');
+      return;
+    }
+
+    // Additional validation for account number
+    if (accountNumber && accountNumber !== '0' && !customerName.trim()) {
+      toast.error('Please check customer account number first');
+      return;
+    }
+
     try {
-      // If there's a customer account number, update their total amount
+      const total = parseFloat(calculateTotal());
+
+      // Get customer ID if account number is provided
+      let customerId = null;
       if (accountNumber && accountNumber !== '0') {
-        const total = parseFloat(calculateTotal());
-        await axios.post('http://localhost:5000/api/customers/update-total', {
-          account_number: accountNumber,
-          amount: total,
-        });
-        toast.success('Customer total amount updated successfully');
+        try {
+          const customerResponse = await axios.get(
+            `http://localhost:5000/api/customers/check/${accountNumber}`
+          );
+          if (customerResponse.data) {
+            customerId = customerResponse.data.id;
+          }
+        } catch (error) {
+          console.error('Error fetching customer:', error);
+          toast.error('Error fetching customer information');
+          return;
+        }
       }
 
-      // Process payment logic here
+      // Create the sale record with proper customer ID
+      const saleData = {
+        amount: total,
+        customerId: customerId,
+        customerName: customerName.trim(),
+        items: cart.map((item) => {
+          const productId = item.product_id;
+          console.log('Processing item:', { productId, name: item.name });
+          return {
+            productId,
+            quantity: item.quantity,
+            price: item.discountedPrice || item.price,
+          };
+        }),
+      };
+
+      console.log('Sending sale data:', saleData);
+
+      // Process the sale
+      const saleResponse = await axios.post(
+        'http://localhost:5000/api/sales/create',
+        saleData
+      );
+      console.log('Sale response:', saleResponse.data);
+
+      // Update product stock
+      for (const item of cart) {
+        try {
+          const stockResponse = await axios.put(
+            `http://localhost:5000/api/products/update-stock/${item.product_id}`,
+            {
+              quantity: item.quantity,
+            }
+          );
+          console.log(
+            `Stock update response for product ${item.name}:`,
+            stockResponse.data
+          );
+        } catch (stockError) {
+          console.error(
+            `Error updating stock for product ${item.name}:`,
+            stockError
+          );
+          continue;
+        }
+      }
+
+      // Update customer total amount if customer exists
+      if (customerId) {
+        try {
+          const customerUpdateResponse = await axios.post(
+            'http://localhost:5000/api/customers/update-total',
+            {
+              account_number: accountNumber,
+              amount: total,
+            }
+          );
+          console.log('Customer update response:', customerUpdateResponse.data);
+          toast.success('Customer total amount updated successfully');
+        } catch (customerError) {
+          console.error('Error updating customer total:', customerError);
+          toast.error('Failed to update customer total');
+        }
+      }
+
+      // Refresh products list to get updated stock quantities
+      await fetchProducts();
+
       setCart([]); // Clear cart after payment
       setActiveDiscount(null); // Clear discount
       setOrderNumber((prev) => prev + 1); // Increment order number
@@ -272,7 +349,14 @@ export default function Pos() {
       toast.success('Payment processed successfully');
     } catch (error) {
       console.error('Error processing payment:', error);
-      toast.error('Failed to process payment');
+      if (axios.isAxiosError(error) && error.response) {
+        const errorMessage =
+          error.response.data.message || 'Failed to process payment';
+        console.error('Server error response:', error.response.data);
+        toast.error(errorMessage);
+      } else {
+        toast.error('Failed to process payment');
+      }
     }
   };
 
@@ -399,11 +483,15 @@ export default function Pos() {
           {sanitizedProducts.map((product) => {
             const currentDate = new Date();
             const isDiscountActive =
-              product.discount_percentage &&
+              typeof product.discount_percentage === 'number' &&
               product.discount_startDate &&
               product.discount_endDate &&
               new Date(product.discount_startDate) <= currentDate &&
               new Date(product.discount_endDate) >= currentDate;
+
+            const discountedPrice = isDiscountActive
+              ? product.price * (1 - (product.discount_percentage || 0) / 100)
+              : product.price;
 
             return (
               <div
@@ -425,11 +513,7 @@ export default function Pos() {
                           ₱{product.price.toFixed(2)}
                         </span>
                         <span className="text-green-600 ml-2">
-                          ₱
-                          {(
-                            product.price *
-                            (1 - product.discount_percentage / 100)
-                          ).toFixed(2)}
+                          ₱{discountedPrice.toFixed(2)}
                         </span>
                         <div className="text-xs text-red-600">
                           {product.discount_percentage}% OFF

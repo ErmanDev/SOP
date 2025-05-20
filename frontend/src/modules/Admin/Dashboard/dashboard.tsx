@@ -1,8 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DollarSign, TrendingDown, TrendingUp, User2 } from 'lucide-react';
+import {
+  DollarSign,
+  TrendingDown,
+  TrendingUp,
+  User2,
+  Users,
+} from 'lucide-react';
 import { StatCardProps } from './types';
 import { PersonIcon } from '@radix-ui/react-icons';
 import { Line } from 'react-chartjs-2';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -27,59 +35,97 @@ ChartJS.register(
   Filler
 );
 
-export default function Dashboard() {
-  // Chart data and options
-  const chartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'], // Example months
-    datasets: [
-      {
-        label: 'Sales',
-        data: [500, 700, 800, 600, 900, 1000], // Example data
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.5, // Smooth curves
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      },
-      {
-        label: 'Total Customers',
-        data: [50, 60, 70, 65, 80, 90], // Example data
-        borderColor: 'rgba(54, 162, 235, 1)',
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.5,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      },
-      {
-        label: 'Total Revenue',
-        data: [1000, 1500, 2000, 1800, 2500, 3000], // Example data
-        borderColor: 'rgba(255, 99, 132, 1)',
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderWidth: 3,
-        fill: true,
-        tension: 0.5,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-      },
-    ],
+interface DashboardData {
+  totalRevenue: string;
+  salesToday: string;
+  totalCustomers: number;
+  pendingOrders: number;
+  returnItems: string;
+  revenueChange: number;
+  salesTodayChange: number;
+  customerChange: number;
+  orderChange: number;
+  returnChange: number;
+  customerStats: {
+    total: number;
+    silver: number;
+    gold: number;
+    platinum: number;
   };
+}
+
+export default function Dashboard() {
+  const [dashboardData, setDashboardData] = useState<DashboardData>({
+    totalRevenue: '₱0',
+    salesToday: '₱0',
+    totalCustomers: 0,
+    pendingOrders: 0,
+    returnItems: '₱0',
+    revenueChange: 0,
+    salesTodayChange: 0,
+    customerChange: 0,
+    orderChange: 0,
+    returnChange: 0,
+    customerStats: {
+      total: 0,
+      silver: 0,
+      gold: 0,
+      platinum: 0,
+    },
+  });
+
+  const [chartData, setChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
+  const fetchDashboardData = async () => {
+    try {
+      const salesResponse = await axios.get(
+        'http://localhost:5000/api/sales/dashboard'
+      );
+      setDashboardData(salesResponse.data);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    }
+  };
+
+  const fetchChartData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/sales/chart');
+      setChartData(response.data);
+    } catch (error) {
+      console.error('Error fetching chart data:', error);
+    }
+  };
+
+  useEffect(() => {
+    // Initial fetch
+    fetchDashboardData();
+    fetchChartData();
+
+    // Set up auto-refresh every 30 seconds
+    const refreshInterval = setInterval(() => {
+      fetchDashboardData();
+      fetchChartData();
+    }, 30000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(refreshInterval);
+  }, []);
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: 'top' as const,
         labels: {
           font: {
             size: 14,
             family: 'Arial, sans-serif',
           },
-          color: '#4B5563', // Modern gray color
+          color: '#4B5563',
         },
       },
       title: {
@@ -89,10 +135,10 @@ export default function Dashboard() {
           size: 18,
           family: 'Arial, sans-serif',
         },
-        color: '#111827', // Darker gray for the title
+        color: '#111827',
       },
       tooltip: {
-        backgroundColor: '#1F2937', // Dark background for tooltips
+        backgroundColor: '#1F2937',
         titleFont: {
           size: 14,
           family: 'Arial, sans-serif',
@@ -101,29 +147,29 @@ export default function Dashboard() {
           size: 12,
           family: 'Arial, sans-serif',
         },
-        bodyColor: '#FFFFFF', // White text
+        bodyColor: '#FFFFFF',
         titleColor: '#FFFFFF',
-        borderColor: '#6B7280', // Border for tooltips
+        borderColor: '#6B7280',
         borderWidth: 1,
       },
     },
     scales: {
       x: {
         grid: {
-          display: false, // Hide grid lines for a cleaner look
+          display: false,
         },
         ticks: {
           font: {
             size: 12,
             family: 'Arial, sans-serif',
           },
-          color: '#6B7280', // Modern gray for axis labels
+          color: '#6B7280',
         },
       },
       y: {
         grid: {
-          color: '#E5E7EB', // Light gray grid lines
-          borderDash: [5, 5], // Dashed grid lines
+          color: '#E5E7EB',
+          borderDash: [5, 5],
         },
         ticks: {
           font: {
@@ -145,46 +191,83 @@ export default function Dashboard() {
         <Line data={chartData} options={chartOptions} />
       </div>
 
-      {/* Stat Cards Section */}
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          icon={<PersonIcon className="h-4 w-4" />}
-          title="Total Revenue"
-          value="₱0"
-          trend={0}
-        />
-        <StatCard
-          icon={<DollarSign className="h-4 w-4" />}
-          title="Sales Today"
-          value="₱0"
-          trend={0}
-        />
-        <StatCard
-          icon={<User2 className="h-4 w-4" />}
-          title="Total Customers"
-          value="0"
-          trend={0}
-        />
-        <StatCard
-          icon={<DollarSign className="h-6 w-6" />}
-          title="Pending/Out of Delivery Orders"
-          value="0"
-          trend={0}
-        />
-        <StatCard
-          icon={<DollarSign className="h-4 w-4" />}
-          title="Return and Refund Items"
-          value="₱0"
-          trend={0}
-        />
+      {/* Customer Stats Section */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-4">Customer Overview</h2>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            icon={<Users className="h-4 w-4" />}
+            title="Total Customers"
+            value={dashboardData.customerStats.total.toString()}
+            trend={dashboardData.customerChange}
+          />
+          <StatCard
+            icon={<User2 className="h-4 w-4" />}
+            title="Silver Members"
+            value={dashboardData.customerStats.silver.toString()}
+            trend={0}
+            className="bg-gray-100"
+          />
+          <StatCard
+            icon={<User2 className="h-4 w-4" />}
+            title="Gold Members"
+            value={dashboardData.customerStats.gold.toString()}
+            trend={0}
+            className="bg-yellow-50"
+          />
+          <StatCard
+            icon={<User2 className="h-4 w-4" />}
+            title="Platinum Members"
+            value={dashboardData.customerStats.platinum.toString()}
+            trend={0}
+            className="bg-purple-50"
+          />
+        </div>
+      </div>
+
+      {/* Sales Stats Section */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Sales Statistics</h2>
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            icon={<PersonIcon className="h-4 w-4" />}
+            title="Total Revenue"
+            value={dashboardData.totalRevenue}
+            trend={dashboardData.revenueChange}
+          />
+          <StatCard
+            icon={<DollarSign className="h-4 w-4" />}
+            title="Sales Today"
+            value={dashboardData.salesToday}
+            trend={dashboardData.salesTodayChange}
+          />
+          <StatCard
+            icon={<DollarSign className="h-6 w-6" />}
+            title="Pending/Out of Delivery Orders"
+            value={dashboardData.pendingOrders.toString()}
+            trend={dashboardData.orderChange}
+          />
+          <StatCard
+            icon={<DollarSign className="h-4 w-4" />}
+            title="Return and Refund Items"
+            value={dashboardData.returnItems}
+            trend={dashboardData.returnChange}
+          />
+        </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ icon, title, value, trend = 0 }: StatCardProps) {
+function StatCard({
+  icon,
+  title,
+  value,
+  trend = 0,
+  className = '',
+}: StatCardProps) {
   return (
-    <Card className="w-full h-full">
+    <Card className={`w-full h-full ${className}`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}

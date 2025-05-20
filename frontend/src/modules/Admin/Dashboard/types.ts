@@ -19,9 +19,9 @@ export interface TopContentData {
 }
 
 export interface StatCardProps {
-  title?: string;
-  value?: string;
-  icon?: React.ReactNode;
-  description?: string;
-  trend?: number;
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+  trend: number;
+  className?: string;
 }
