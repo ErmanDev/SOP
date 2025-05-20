@@ -138,25 +138,28 @@ exports.deleteProduct = async (req, res) => {
 // Update product stock
 exports.updateProductStock = async (req, res) => {
   try {
-    const { stock_quantity } = req.body;
+    const { product_id } = req.params;
+    const { quantity } = req.body;
 
-    const [updated] = await db.Products.update(
-      { stock_quantity },
-      {
-        where: { product_id: req.params.product_id },
-      }
-    );
-
-    if (!updated) {
+    const product = await db.Products.findByPk(product_id);
+    if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const updatedProduct = await db.Products.findOne({
-      where: { product_id: req.params.product_id },
+    if (product.stock_quantity < quantity) {
+      return res.status(400).json({ message: 'Insufficient stock' });
+    }
+
+    await product.update({
+      stock_quantity: product.stock_quantity - quantity,
     });
 
-    res.status(200).json(updatedProduct);
+    res.json({
+      message: 'Stock updated successfully',
+      product,
+    });
   } catch (error) {
+    console.error('Error updating product stock:', error);
     res.status(500).json({ message: error.message });
   }
 };

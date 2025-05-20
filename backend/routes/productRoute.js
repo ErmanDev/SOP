@@ -55,4 +55,7 @@ router.patch('/:product_id/stock', productController.updateProductStock);
 // Update product status
 router.patch('/:product_id/status', productController.updateProductStatus);
 
+// Update product stock
+router.put('/update-stock/:product_id', productController.updateProductStock);
+
 module.exports = router;

@@ -1,9 +1,9 @@
-const Customer = require('../models/customer');
+const db = require('../models/main');
 
 const CustomerController = {
   async getAll(req, res) {
     try {
-      const customers = await Customer.findAll();
+      const customers = await db.Customers.findAll();
       res.json(customers);
     } catch (err) {
       res.status(500).json({ message: err.message });
@@ -12,7 +12,7 @@ const CustomerController = {
 
   async getById(req, res) {
     try {
-      const customer = await Customer.findByPk(req.params.id);
+      const customer = await db.Customers.findByPk(req.params.id);
       if (!customer)
         return res.status(404).json({ message: 'Customer not found' });
       res.json(customer);
@@ -32,7 +32,7 @@ const CustomerController = {
       // Set default values
       req.body.totalAmount = req.body.totalAmount || '0';
 
-      const customer = await Customer.create(req.body);
+      const customer = await db.Customers.create(req.body);
       res.status(201).json(customer);
     } catch (err) {
       console.error('Error creating customer:', err);
@@ -54,7 +54,7 @@ const CustomerController = {
 
   async update(req, res) {
     try {
-      const customer = await Customer.findByPk(req.params.id);
+      const customer = await db.Customers.findByPk(req.params.id);
       if (!customer)
         return res.status(404).json({ message: 'Customer not found' });
 
@@ -80,7 +80,7 @@ const CustomerController = {
 
   async delete(req, res) {
     try {
-      const customer = await Customer.findByPk(req.params.id);
+      const customer = await db.Customers.findByPk(req.params.id);
       if (!customer)
         return res.status(404).json({ message: 'Customer not found' });
       await customer.destroy();
@@ -94,7 +94,9 @@ const CustomerController = {
   async checkAccountNumber(req, res) {
     try {
       const { account_number } = req.params;
-      const customer = await Customer.findOne({ where: { account_number } });
+      const customer = await db.Customers.findOne({
+        where: { account_number },
+      });
       if (!customer) {
         return res.status(404).json({ message: 'Account number not found' });
       }
@@ -107,7 +109,9 @@ const CustomerController = {
   async updateTotalAmount(req, res) {
     try {
       const { account_number, amount } = req.body;
-      const customer = await Customer.findOne({ where: { account_number } });
+      const customer = await db.Customers.findOne({
+        where: { account_number },
+      });
 
       if (!customer) {
         return res.status(404).json({ message: 'Customer not found' });

@@ -11,6 +11,7 @@ const productRoute = require('./routes/productRoute.js');
 const discountRoute = require('./routes/discountRoute.js');
 const customerRoute = require('./routes/customerRoute.js');
 const payrollRoute = require('./routes/payrollRoute.js');
+const salesRoute = require('./routes/salesRoute');
 
 //middleware
 app.use(cors());
@@ -26,6 +27,7 @@ app.use('/api/products', productRoute);
 app.use('/api/discounts', discountRoute);
 app.use('/api/customers', customerRoute);
 app.use('/api/payrolls', payrollRoute);
+app.use('/api/sales', salesRoute);
 
 const db = require('./models/main');
 db.sequelize

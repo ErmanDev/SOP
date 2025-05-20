@@ -1,18 +1,23 @@
-const Sequelize = require('sequelize');
-const dbConfig = require('../config/db');
+const { Sequelize } = require('sequelize');
+const config = require('../config/config.json');
+
+// Use the configuration based on the current environment
+const env = process.env.NODE_ENV || 'development';
+const dbConfig = config[env];
 
 const sequelize = new Sequelize(
   dbConfig.database,
-  dbConfig.user,
+  dbConfig.username,
   dbConfig.password,
   {
     host: dbConfig.host,
     dialect: dbConfig.dialect,
+    logging: false,
     pool: {
-      min: dbConfig.pool.min,
-      max: dbConfig.pool.max,
-      acquire: dbConfig.pool.acquire,
-      idle: dbConfig.pool.idle,
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
     },
   }
 );
@@ -23,11 +28,16 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 // Import models
+db.Products = require('./products')(sequelize, Sequelize);
+db.Orders = require('./order')(sequelize, Sequelize);
+db.Sales = require('./sale')(sequelize, Sequelize);
+db.Returns = require('./return')(sequelize, Sequelize);
+db.Customers = require('./customer')(sequelize, Sequelize);
 db.UserRoles = require('./user_roles')(sequelize, Sequelize);
 db.Users = require('./users')(sequelize, Sequelize);
-db.Discount = require('./discount')(sequelize, Sequelize); // Import Discount first
-db.Products = require('./products')(sequelize, Sequelize); // Import Products after Discount
+db.Discount = require('./discount')(sequelize, Sequelize);
 db.Payroll = require('./payroll')(sequelize, Sequelize);
+
 // Initialize associations
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
@@ -35,32 +45,19 @@ Object.keys(db).forEach((modelName) => {
   }
 });
 
-// Sync all models in the correct order
-const syncDatabase = async () => {
-  try {
-    // Drop existing tables if they exist
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 0');
-
-    // Force sync Discount table to add new column
-    await db.Discount.sync({ alter: true });
-    console.log('Discount table synchronized with new columns');
-
-    // Sync other tables normally
-    await db.Products.sync();
-    console.log('Products table synchronized');
-
-    await db.UserRoles.sync();
-    await db.Users.sync();
-
-    await sequelize.query('SET FOREIGN_KEY_CHECKS = 1');
-
+// Test the connection
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Database connection has been established successfully.');
+    // Sync models with the database
+    return sequelize.sync({ alter: true });
+  })
+  .then(() => {
     console.log('Database synchronized successfully');
-  } catch (error) {
-    console.error('Error synchronizing database:', error);
-    process.exit(1); // Exit if sync fails
-  }
-};
-
-syncDatabase();
+  })
+  .catch((err) => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 module.exports = db;
