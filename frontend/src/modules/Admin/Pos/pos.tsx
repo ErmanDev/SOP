@@ -50,7 +50,10 @@ export default function Pos() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeDiscount, setActiveDiscount] = useState<string | null>(null);
-  const [orderNumber, setOrderNumber] = useState(1);
+  const [orderNumber, setOrderNumber] = useState(() => {
+    const savedOrderNumber = localStorage.getItem('lastOrderNumber');
+    return savedOrderNumber ? parseInt(savedOrderNumber) : 1;
+  });
   const [categories, setCategories] = useState<Category[]>([
     { id: 'all', name: 'All', count: 0 },
     { id: 'Home Appliance', name: 'Home Appliance', count: 0 },
@@ -341,9 +344,11 @@ export default function Pos() {
       // Refresh products list to get updated stock quantities
       await fetchProducts();
 
+      const nextOrderNumber = orderNumber + 1;
+      localStorage.setItem('lastOrderNumber', nextOrderNumber.toString());
+      setOrderNumber(nextOrderNumber); // Increment order number
       setCart([]); // Clear cart after payment
       setActiveDiscount(null); // Clear discount
-      setOrderNumber((prev) => prev + 1); // Increment order number
       setCustomerName(''); // Clear customer name
       setAccountNumber(''); // Clear account number
       toast.success('Payment processed successfully');

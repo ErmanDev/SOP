@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Download,
   FileText,
@@ -38,16 +38,6 @@ const inventoryData = [
   { name: 'Low Stock', value: 200 },
 ];
 
-const payrollData = [
-  { name: 'Jan', total: 250000, paid: 230000 },
-  { name: 'Feb', total: 280000, paid: 270000 },
-  { name: 'Mar', total: 300000, paid: 290000 },
-  { name: 'Apr', total: 320000, paid: 310000 },
-  { name: 'May', total: 350000, paid: 340000 },
-  { name: 'Jun', total: 380000, paid: 370000 },
-  { name: 'Jul', total: 400000, paid: 390000 },
-];
-
 interface StatCardProps {
   icon: React.ReactNode;
   title: string;
@@ -55,9 +45,158 @@ interface StatCardProps {
   trend?: number;
 }
 
+interface PayrollEntry {
+  id: string;
+  name: string;
+  position: string;
+  status: string;
+  salary: number;
+  createdAt: string;
+}
+
+interface MonthlyPayrollData {
+  name: string;
+  total: number;
+  paid: number;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  category: string;
+  stock_quantity: number;
+  status: string;
+  image_url: string;
+}
+
 export default function Reports() {
   const [selectedReport, setSelectedReport] = useState<string>('sales');
   const [dateRange, setDateRange] = useState<string>('monthly');
+  const [employeeCount, setEmployeeCount] = useState<number>(0);
+  const [totalPayroll, setTotalPayroll] = useState<number>(0);
+  const [averageSalary, setAverageSalary] = useState<number>(0);
+  const [payrollData, setPayrollData] = useState<PayrollEntry[]>([]);
+  const [monthlyPayrollData, setMonthlyPayrollData] = useState<
+    MonthlyPayrollData[]
+  >([]);
+  const [inventoryStats, setInventoryStats] = useState({
+    totalProducts: 0,
+    lowStockItems: 0,
+    inventoryValue: 0,
+    stockTurnover: 4.2, // This could be calculated if we have sales data
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch employees and payroll data
+        const employeeResponse = await fetch(
+          'http://localhost:5000/api/users/getEmployee'
+        );
+        if (!employeeResponse.ok) throw new Error('Failed to fetch employees');
+        const employeeData = await employeeResponse.json();
+        setEmployeeCount(employeeData.length);
+
+        const payrollResponse = await fetch(
+          'http://localhost:5000/api/payrolls'
+        );
+        if (!payrollResponse.ok) throw new Error('Failed to fetch payroll');
+        const payrollData = await payrollResponse.json();
+        setPayrollData(payrollData);
+
+        // Calculate total payroll and average salary
+        const total = payrollData.reduce(
+          (sum: number, entry: PayrollEntry) => sum + Number(entry.salary),
+          0
+        );
+        setTotalPayroll(total);
+        const avgSalary =
+          employeeData.length > 0 ? total / employeeData.length : 0;
+        setAverageSalary(avgSalary);
+
+        // Create monthly payroll data for chart
+        const today = new Date();
+        const monthlyData = Array.from({ length: 7 }, (_, i) => {
+          const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+          return {
+            name: date.toLocaleString('default', {
+              month: 'short',
+              year: '2-digit',
+            }),
+            total: 0,
+            paid: 0,
+            date: date, // Keep date for sorting
+          };
+        });
+
+        // Sort data from oldest to newest
+        monthlyData.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        // Fill in the actual data
+        const filledMonthlyData = monthlyData.map((monthData) => {
+          const monthStart = monthData.date;
+          const monthEnd = new Date(
+            monthStart.getFullYear(),
+            monthStart.getMonth() + 1,
+            0
+          );
+
+          // Calculate total salary for this month
+          const monthTotal = payrollData.reduce(
+            (sum: number, entry: PayrollEntry) => {
+              const entryDate = new Date(entry.createdAt);
+              if (entryDate >= monthStart && entryDate <= monthEnd) {
+                return sum + Number(entry.salary);
+              }
+              return sum;
+            },
+            0
+          );
+
+          return {
+            name: monthData.name,
+            total: monthTotal,
+            paid: monthTotal * 0.98, // Assuming 98% efficiency
+          };
+        });
+
+        setMonthlyPayrollData(filledMonthlyData);
+
+        // Fetch products for inventory stats
+        const productsResponse = await fetch(
+          'http://localhost:5000/api/products'
+        );
+        if (!productsResponse.ok) throw new Error('Failed to fetch products');
+        const productsData: Product[] = await productsResponse.json();
+
+        // Calculate inventory statistics
+        const activeProducts = productsData.filter(
+          (product) => product.status === 'Active'
+        );
+        const inventoryValue = activeProducts.reduce(
+          (sum, product) => sum + Number(product.price),
+          0
+        );
+        const lowestStock = Math.min(
+          ...activeProducts.map((product) => product.stock_quantity)
+        );
+
+        setInventoryStats({
+          totalProducts: activeProducts.length,
+          lowStockItems: activeProducts.filter(
+            (product) => product.stock_quantity <= 10
+          ).length,
+          inventoryValue: inventoryValue,
+          stockTurnover: 4.2,
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleExport = () => {
     let dataToExport;
@@ -91,7 +230,7 @@ export default function Reports() {
     const csvContent = [
       headers.join(','),
       ...dataToExport.map((row) =>
-        headers.map((header) => row[header]).join(',')
+        headers.map((header) => row[header as keyof typeof row]).join(',')
       ),
     ].join('\n');
 
@@ -105,18 +244,22 @@ export default function Reports() {
     document.body.removeChild(link);
   };
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
   const renderStatCards = () => {
+    const formattedTotalSales = formatCurrency(
+      salesData.reduce((sum, item) => sum + item.sales, 0)
+    );
+
     switch (selectedReport) {
       case 'sales':
-        // Calculate total sales from salesData
-        const totalSales = salesData.reduce((sum, item) => sum + item.sales, 0);
-        const formattedTotalSales = new Intl.NumberFormat('en-PH', {
-          style: 'currency',
-          currency: 'PHP',
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(totalSales);
-
         return (
           <>
             <StatCard
@@ -151,25 +294,25 @@ export default function Reports() {
             <StatCard
               icon={<Package className="h-4 w-4" />}
               title="Total Products"
-              value="1,234"
+              value={inventoryStats.totalProducts.toString()}
               trend={0}
             />
             <StatCard
               icon={<Package className="h-4 w-4" />}
               title="Low Stock Items"
-              value="45"
+              value={inventoryStats.lowStockItems.toString()}
               trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Inventory Value"
-              value="₱234,567"
+              value={formatCurrency(inventoryStats.inventoryValue)}
               trend={0}
             />
             <StatCard
               icon={<TrendingUp className="h-4 w-4" />}
               title="Stock Turnover"
-              value="4.2x"
+              value={`${inventoryStats.stockTurnover}x`}
               trend={0}
             />
           </>
@@ -180,19 +323,19 @@ export default function Reports() {
             <StatCard
               icon={<Users className="h-4 w-4" />}
               title="Total Employees"
-              value="45"
+              value={employeeCount.toString()}
               trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Total Payroll"
-              value="₱450,000"
+              value={formatCurrency(totalPayroll)}
               trend={0}
             />
             <StatCard
               icon={<DollarSign className="h-4 w-4" />}
               title="Average Salary"
-              value="₱10,000"
+              value={formatCurrency(averageSalary)}
               trend={0}
             />
             <StatCard
@@ -281,7 +424,7 @@ export default function Reports() {
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={payrollData}
+                    data={monthlyPayrollData}
                     margin={{
                       top: 20,
                       right: 30,
@@ -291,11 +434,29 @@ export default function Reports() {
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
+                    <YAxis
+                      tickFormatter={(value) =>
+                        new Intl.NumberFormat('en-PH', {
+                          style: 'currency',
+                          currency: 'PHP',
+                          minimumFractionDigits: 0,
+                          maximumFractionDigits: 0,
+                        }).format(value)
+                      }
+                    />
+                    <Tooltip
+                      formatter={(value: number) =>
+                        new Intl.NumberFormat('en-PH', {
+                          style: 'currency',
+                          currency: 'PHP',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(value)
+                      }
+                    />
                     <Legend />
-                    <Bar dataKey="total" fill="#8884d8" />
-                    <Bar dataKey="paid" fill="#82ca9d" />
+                    <Bar dataKey="total" name="Total Payroll" fill="#8884d8" />
+                    <Bar dataKey="paid" name="Paid Amount" fill="#82ca9d" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
