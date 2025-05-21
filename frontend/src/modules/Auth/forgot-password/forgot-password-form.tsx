@@ -27,7 +27,7 @@ const ForgotPasswordForm: React.FC = () => {
         'http://localhost:5000/api/email/send-email',
         {
           to: email,
-          subject: 'Password Reset Request - QuickMart POS',
+          subject: 'Password Reset Request',
           text: `Please click this link to reset your password: http://localhost:5173/reset-password?email=${encodeURIComponent(
             email
           )}`,
