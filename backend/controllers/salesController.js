@@ -308,6 +308,7 @@ const SalesController = {
           customerId,
           totalAmount: amount,
           status: 'delivered',
+          items: items,
         },
         { transaction: t }
       );
@@ -367,6 +368,36 @@ const SalesController = {
     } catch (error) {
       await t.rollback();
       console.error('Error creating sale:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  async getAllSales(req, res) {
+    try {
+      const sales = await db.Orders.findAll({
+        where: {
+          status: 'delivered',
+        },
+        include: [
+          {
+            model: db.Customers,
+            attributes: ['name'],
+          },
+        ],
+        order: [['createdAt', 'DESC']],
+      });
+
+      const formattedSales = sales.map((sale) => ({
+        id: sale.id,
+        customerName: sale.Customer ? sale.Customer.name : 'Walk-in Customer',
+        totalItems: sale.items ? JSON.parse(sale.items).length : 0,
+        totalAmount: sale.totalAmount,
+        createdAt: sale.createdAt,
+      }));
+
+      res.json(formattedSales);
+    } catch (error) {
+      console.error('Error fetching sales:', error);
       res.status(500).json({ message: error.message });
     }
   },

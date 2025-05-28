@@ -26,6 +26,17 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 0,
       },
+      items: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+        get() {
+          const rawValue = this.getDataValue('items');
+          return rawValue ? JSON.parse(rawValue) : [];
+        },
+        set(value) {
+          this.setDataValue('items', JSON.stringify(value));
+        },
+      },
       createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -42,6 +53,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+
+  Order.associate = (models) => {
+    Order.belongsTo(models.Customer, {
+      foreignKey: 'customerId',
+      as: 'Customer',
+    });
+  };
 
   return Order;
 };

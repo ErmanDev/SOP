@@ -66,6 +66,8 @@ export default function Pos() {
   const [showCustomerDialog, setShowCustomerDialog] = useState(false);
   const [showNameInput, setShowNameInput] = useState(false);
   const [foundCustomer, setFoundCustomer] = useState<Customer | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [cashAmount, setCashAmount] = useState('');
 
   const fetchProducts = async () => {
     try {
@@ -256,9 +258,19 @@ export default function Pos() {
       return;
     }
 
-    try {
-      const total = parseFloat(calculateTotal());
+    setShowPaymentModal(true);
+  };
 
+  const handlePaymentSubmit = async () => {
+    const total = parseFloat(calculateTotal());
+    const cash = parseFloat(cashAmount);
+
+    if (isNaN(cash) || cash < total) {
+      toast.error('Insufficient cash amount');
+      return;
+    }
+
+    try {
       // Get customer ID if account number is provided
       let customerId = null;
       if (accountNumber && accountNumber !== '0') {
@@ -351,6 +363,8 @@ export default function Pos() {
       setActiveDiscount(null); // Clear discount
       setCustomerName(''); // Clear customer name
       setAccountNumber(''); // Clear account number
+      setCashAmount(''); // Clear cash amount
+      setShowPaymentModal(false); // Close payment modal
       toast.success('Payment processed successfully');
     } catch (error) {
       console.error('Error processing payment:', error);
@@ -717,6 +731,65 @@ export default function Pos() {
                     <AlertDialogAction type="submit">Confirm</AlertDialogAction>
                   </div>
                 </form>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <AlertDialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Payment Details</AlertDialogTitle>
+              <AlertDialogDescription>
+                <div className="mt-4 space-y-4">
+                  <div className="flex justify-between">
+                    <span>Total Amount:</span>
+                    <span>₱{calculateTotal()}</span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Cash Amount:
+                    </label>
+                    <input
+                      type="number"
+                      value={cashAmount}
+                      onChange={(e) => setCashAmount(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg text-black border"
+                      placeholder="Enter cash amount"
+                      required
+                    />
+                  </div>
+                  {cashAmount && (
+                    <div className="flex justify-between">
+                      <span>Change:</span>
+                      <span
+                        className={`${
+                          parseFloat(cashAmount) -
+                            parseFloat(calculateTotal()) <
+                          0
+                            ? 'text-red-600'
+                            : 'text-green-600'
+                        }`}
+                      >
+                        ₱
+                        {(
+                          parseFloat(cashAmount) - parseFloat(calculateTotal())
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex justify-end space-x-2 mt-4">
+                  <AlertDialogCancel onClick={() => setShowPaymentModal(false)}>
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction onClick={handlePaymentSubmit}>
+                    Confirm Payment
+                  </AlertDialogAction>
+                </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
           </AlertDialogContent>

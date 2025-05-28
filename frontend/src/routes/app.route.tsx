@@ -8,7 +8,7 @@ import ForgotPasswordPage from '@/modules/Auth/forgot-password/forgot-password-p
 import UserLayout from '@/layouts/user.layout';
 import Customers from '@/modules/Admin/Customers/customers';
 import Employees from '@/modules/Admin/Employees/employees';
-import Purchase from '@/modules/Admin/Purchase/purchase';
+// import Purchase from '@/modules/Admin/Purchase/purchase';
 import Sales from '@/modules/Admin/Sales/sales';
 import Pos from '@/modules/Admin/Pos/pos';
 import Payroll from '@/modules/Admin/Payroll/payroll';
@@ -71,10 +71,10 @@ export const router = createBrowserRouter([
             path: '/sales',
             Component: Sales,
           },
-          {
-            path: '/purchase',
-            Component: Purchase,
-          },
+          // {
+          //   path: '/purchase',
+          //   Component: Purchase,
+          // },
           {
             path: '/customers',
             Component: Customers,
@@ -97,8 +97,8 @@ export const router = createBrowserRouter([
           },
           {
             path: '/discount',
-            Component: Discounts
-          }
+            Component: Discounts,
+          },
         ],
       },
     ],

@@ -80,12 +80,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         icon: Percent,
         roles: ['admin', 'employee'],
       },
-      {
-        title: 'Purchase',
-        url: '/purchase',
-        icon: ShoppingBasket,
-        roles: ['admin', 'employee'],
-      },
+      // {
+      //   title: 'Purchase',
+      //   url: '/purchase',
+      //   icon: ShoppingBasket,
+      //   roles: ['admin', 'employee'],
+      // },
       {
         title: 'Customers',
         url: '/customers',
