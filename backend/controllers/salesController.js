@@ -313,6 +313,16 @@ const SalesController = {
         { transaction: t }
       );
 
+      // Create a sale record
+      await db.Sales.create(
+        {
+          amount,
+          customerId,
+          orderId: order.id,
+        },
+        { transaction: t }
+      );
+
       // Update product stock quantities
       for (const item of items) {
         console.log('Processing item:', item);
@@ -398,6 +408,44 @@ const SalesController = {
       res.json(formattedSales);
     } catch (error) {
       console.error('Error fetching sales:', error);
+      res.status(500).json({ message: error.message });
+    }
+  },
+
+  async getCustomerSalesSummary(req, res) {
+    try {
+      const customers = await db.Customers.findAll({
+        include: [
+          {
+            model: db.Orders,
+            as: 'orders',
+            where: { status: 'delivered' },
+            required: false,
+          },
+        ],
+      });
+
+      const result = customers.map((customer) => {
+        const orders = customer.orders || [];
+        const totalPurchase = orders.reduce(
+          (sum, order) => sum + parseFloat(order.totalAmount),
+          0
+        );
+
+        return {
+          customerName: customer.name,
+          totalPurchase,
+          orders: orders.map((order) => ({
+            id: order.id,
+            date: order.createdAt,
+            totalAmount: order.totalAmount,
+          })),
+        };
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error('Error fetching customer sales summary:', error);
       res.status(500).json({ message: error.message });
     }
   },

@@ -44,9 +44,9 @@ module.exports = {
       }
 
       let formattedUserId;
-      if (role_id === '1') {
+      if (parseInt(role_id) === 1) {
         formattedUserId = `ADM${user_id}`;
-      } else if (role_id === '2') {
+      } else if (parseInt(role_id) === 2) {
         formattedUserId = `EMP${user_id}`;
       } else {
         return res.status(400).json({ error: 'Role Invalid' });
